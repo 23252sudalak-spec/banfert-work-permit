@@ -10,6 +10,77 @@ export type QuestionType =
 
 export type Language = 'th' | 'zh' | 'my' | 'bilingual_th_my' | 'bilingual_th_zh' | 'trilingual';
 
+export type PermitStatus =
+  | 'draft'
+  | 'pending_approval'
+  | 'approved'
+  | 'conditional'
+  | 'rejected'
+  | 'work_in_progress'
+  | 'closed';
+
+export interface GasMeasurement {
+  o2: string;    // e.g. "20.9" (Standard 19.5 - 23.5%)
+  lel: string;   // e.g. "0" (Standard < 10%)
+  co: string;    // e.g. "0" (Standard < 25 ppm)
+  h2s: string;   // e.g. "0" (Standard < 10 ppm)
+  testedAt?: string;
+  testerName?: string;
+  meterModel?: string;
+}
+
+export interface RiskMatrixScore {
+  probability: number; // 1-5
+  severity: number;    // 1-5
+  score: number;       // 1-25
+  level: 'low' | 'medium' | 'high' | 'extreme';
+}
+
+export interface PermitRecord {
+  id: string; // e.g. "PTW-2026-001"
+  permitNumber: string;
+  createdAt: string; // ISO
+  updatedAt: string; // ISO
+  status: PermitStatus;
+
+  // Section 1: General Info
+  applicantName: string;
+  applicantRole: string;
+  company: string;
+  phone: string;
+  location: string;
+  workDate: string; // YYYY-MM-DD
+  startTime: string; // HH:mm
+  endTime: string;   // HH:mm
+  workerCount: number;
+
+  // Section 2: Risk Types
+  riskTypes: string[];
+  otherRiskDetails?: string;
+
+  // Section 3: Job Details & Safety Checklist
+  jobDescription: string;
+  workerRoster: string;
+  selectedPPE: string[];
+  safetyControls: string[];
+  gasReadings?: GasMeasurement;
+  preWorkMeasurements?: string;
+
+  // Section 4: Approvals & Sign-off
+  complianceAgreed: boolean;
+  applicantSignature: string;
+  safetyOfficerName: string;
+  approvalDecision: 'approved' | 'conditional' | 'rejected' | 'pending';
+  safetyOfficerRemarks?: string;
+  attachmentLinks?: string;
+
+  // Risk Score
+  riskMatrix: RiskMatrixScore;
+
+  // Metadata
+  createdByEmail?: string;
+}
+
 export interface MultilingualText {
   th: string;
   zh: string;

@@ -7,17 +7,33 @@ export interface CreateFormResult {
   title: string;
 }
 
+/**
+ * Google Forms API rejects newline characters in description and title fields,
+ * which frequently triggers a 500 "Internal error" from Google's servers.
+ * This helper strips newlines and control characters.
+ */
+function cleanText(text: string | undefined | null, maxLength = 250): string {
+  if (!text) return '';
+  return text
+    .replace(/[\r\n]+/g, ' • ')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .slice(0, maxLength);
+}
+
 export async function createGoogleFormFromSections(
   sections: FormSection[],
   accessToken: string,
   customTitle?: string,
   onProgress?: (status: string, percentage: number) => void
 ): Promise<CreateFormResult> {
-  const formTitle =
+  const formTitle = cleanText(
     customTitle?.trim() ||
-    'ใบอนุญาตปฏิบัติงานที่มีความเสี่ยง (Permit to Work - PTW) [มาตรฐาน จป.วิชาชีพ]';
+      'ใบอนุญาตปฏิบัติงานที่มีความเสี่ยง (Permit to Work - PTW)',
+    120
+  );
 
-  onProgress?.('กำลังเริ่มสร้างไฟล์ Google Form ใหม่...', 10);
+  onProgress?.('กำลังสร้างเอกสาร Google Form...', 15);
 
   // 1. Create the initial blank form
   const createResponse = await fetch('https://forms.googleapis.com/v1/forms', {
@@ -29,13 +45,13 @@ export async function createGoogleFormFromSections(
     body: JSON.stringify({
       info: {
         title: formTitle,
-        documentTitle: formTitle,
       },
     }),
   });
 
   if (!createResponse.ok) {
     const errorData = await createResponse.json().catch(() => ({}));
+    console.error('Google Forms Create Error:', errorData);
     const message =
       errorData?.error?.message ||
       `สร้าง Google Form ไม่สำเร็จ (HTTP ${createResponse.status})`;
@@ -44,82 +60,108 @@ export async function createGoogleFormFromSections(
 
   const createdFormData = await createResponse.json();
   const formId = createdFormData.formId;
-  const responderUri = createdFormData.responderUri || `https://docs.google.com/forms/d/e/${formId}/viewform`;
+  const responderUri =
+    createdFormData.responderUri ||
+    `https://docs.google.com/forms/d/e/${formId}/viewform`;
   const editUri = `https://docs.google.com/forms/d/${formId}/edit`;
 
-  onProgress?.('สร้างเอกสารสำเร็จ กำลังจัดเตรียมโครงสร้างคำถามและหมวดหมู่...', 30);
+  onProgress?.('สร้างเอกสารสำเร็จ กำลังจัดเตรียมโครงสร้างคำถาม...', 30);
 
-  // 2. Build the batchUpdate requests
-  const requests: any[] = [];
+  // 2. Update Form Description (single-line without raw newlines)
+  try {
+    const desc = cleanText(
+      'ระบบใบอนุญาตปฏิบัติงานที่มีความเสี่ยง (Permit to Work System - PTW) ' +
+      'ตามมาตรฐาน จป.วิชาชีพ และ พ.ร.บ.ความปลอดภัย อาชีวอนามัย และสภาพแวดล้อมในการทำงาน พ.ศ. 2554'
+    );
 
-  // Update overall form description
-  requests.push({
-    updateFormInfo: {
-      info: {
-        description:
-          'ระบบใบอนุญาตปฏิบัติงานที่มีความเสี่ยง (Permit to Work System - PTW)\n' +
-          'จัดทำขึ้นตามมาตรฐานเจ้าหน้าที่ความปลอดภัยในการทำงาน (จป.วิชาชีพ) และสอดคล้องกับ พ.ร.บ.ความปลอดภัย อาชีวอนามัย และสภาพแวดล้อมในการทำงาน พ.ศ. 2554\n' +
-          '⚠️ คำเตือน: ผู้รับเหมาหรือพนักงานทุกคนต้องได้รับการอนุมัติใบอนุญาตนี้ก่อนเริ่มปฏิบัติงานเสี่ยงโดยเด็ดขาด',
-      },
-      updateMask: 'description',
-    },
-  });
+    await fetch(
+      `https://forms.googleapis.com/v1/forms/${encodeURIComponent(formId)}:batchUpdate`,
+      {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          requests: [
+            {
+              updateFormInfo: {
+                info: { description: desc },
+                updateMask: 'description',
+              },
+            },
+          ],
+        }),
+      }
+    );
+  } catch (err) {
+    console.warn('Could not update form description, continuing with questions...', err);
+  }
 
-  let itemIndex = 0;
+  // 3. Build items by section and send in smaller batches to avoid Google 500 "Internal error"
+  let currentItemIndex = 0;
 
   for (let sIdx = 0; sIdx < sections.length; sIdx++) {
     const section = sections[sIdx];
+    const sectionProgress = 35 + Math.round(((sIdx + 1) / sections.length) * 55);
+    onProgress?.(`กำลังบันทึกส่วนที่ ${section.sectionNumber}: ${cleanText(section.title, 40)}...`, sectionProgress);
 
-    // If section > 0, create a pageBreakItem (Google Forms Section)
+    const sectionRequests: any[] = [];
+
+    // Add PageBreak for Section 2, 3, 4
     if (sIdx > 0) {
-      requests.push({
+      sectionRequests.push({
         createItem: {
           item: {
-            title: section.title,
-            description: section.description,
+            title: cleanText(section.title, 120),
             pageBreakItem: {},
           },
-          location: { index: itemIndex },
+          location: { index: currentItemIndex },
         },
       });
-      itemIndex++;
+      currentItemIndex++;
     }
 
-    // Add each question in this section
+    // Add questions for this section
     for (const q of section.questions) {
+      const qDescParts = [
+        q.description ? cleanText(q.description, 150) : '',
+        q.legalReference ? `[⚖️ ${cleanText(q.legalReference, 60)}]` : '',
+        q.safetyOfficerTip ? `[💡 ${cleanText(q.safetyOfficerTip, 100)}]` : '',
+      ].filter(Boolean);
+
+      const description = qDescParts.join(' • ');
+
       const itemPayload: any = {
-        title: q.title,
-        description: [
-          q.description || '',
-          q.legalReference ? `⚖️ อ้างอิงมาตรฐาน: ${q.legalReference}` : '',
-          q.safetyOfficerTip ? `💡 ข้อแนะนำ จป.วิชาชีพ: ${q.safetyOfficerTip}` : '',
-        ]
-          .filter(Boolean)
-          .join('\n'),
+        title: cleanText(q.title, 180),
       };
+
+      if (description) {
+        itemPayload.description = description;
+      }
 
       if (q.type === 'SHORT_ANSWER') {
         itemPayload.questionItem = {
           question: {
-            required: q.required,
+            required: !!q.required,
             textQuestion: { paragraph: false },
           },
         };
       } else if (q.type === 'PARAGRAPH') {
         itemPayload.questionItem = {
           question: {
-            required: q.required,
+            required: !!q.required,
             textQuestion: { paragraph: true },
           },
         };
       } else if (q.type === 'MULTIPLE_CHOICE') {
         itemPayload.questionItem = {
           question: {
-            required: q.required,
+            required: !!q.required,
             choiceQuestion: {
               type: 'RADIO',
               options: (q.options || ['ใช่', 'ไม่ใช่']).map((opt) => ({
-                value: opt,
+                value: cleanText(opt, 120),
               })),
             },
           },
@@ -127,11 +169,11 @@ export async function createGoogleFormFromSections(
       } else if (q.type === 'CHECKBOXES') {
         itemPayload.questionItem = {
           question: {
-            required: q.required,
+            required: !!q.required,
             choiceQuestion: {
               type: 'CHECKBOX',
               options: (q.options || ['ยืนยัน']).map((opt) => ({
-                value: opt,
+                value: cleanText(opt, 120),
               })),
             },
           },
@@ -139,11 +181,11 @@ export async function createGoogleFormFromSections(
       } else if (q.type === 'DROPDOWN') {
         itemPayload.questionItem = {
           question: {
-            required: q.required,
+            required: !!q.required,
             choiceQuestion: {
               type: 'DROP_DOWN',
               options: (q.options || ['ตัวเลือก 1']).map((opt) => ({
-                value: opt,
+                value: cleanText(opt, 120),
               })),
             },
           },
@@ -151,7 +193,7 @@ export async function createGoogleFormFromSections(
       } else if (q.type === 'DATE') {
         itemPayload.questionItem = {
           question: {
-            required: q.required,
+            required: !!q.required,
             dateQuestion: {
               includeTime: false,
               includeYear: true,
@@ -161,50 +203,93 @@ export async function createGoogleFormFromSections(
       } else if (q.type === 'TIME') {
         itemPayload.questionItem = {
           question: {
-            required: q.required,
-            timeQuestion: {},
+            required: !!q.required,
+            timeQuestion: {
+              duration: false,
+            },
           },
         };
       } else {
-        // Fallback for file upload or custom types (via short answer text link for Drive upload)
+        // Fallback: Text question
         itemPayload.questionItem = {
           question: {
-            required: q.required,
+            required: !!q.required,
             textQuestion: { paragraph: false },
           },
         };
       }
 
-      requests.push({
+      sectionRequests.push({
         createItem: {
           item: itemPayload,
-          location: { index: itemIndex },
+          location: { index: currentItemIndex },
         },
       });
-      itemIndex++;
+      currentItemIndex++;
     }
-  }
 
-  onProgress?.('กำลังอัปเดตคำถามและมาตรการความปลอดภัยทั้งหมดลงแบบฟอร์ม...', 65);
+    // Execute this section's batch update
+    if (sectionRequests.length > 0) {
+      const batchRes = await fetch(
+        `https://forms.googleapis.com/v1/forms/${encodeURIComponent(formId)}:batchUpdate`,
+        {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ requests: sectionRequests }),
+        }
+      );
 
-  const batchResponse = await fetch(
-    `https://forms.googleapis.com/v1/forms/${encodeURIComponent(formId)}:batchUpdate`,
-    {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ requests }),
+      if (!batchRes.ok) {
+        const errorData = await batchRes.json().catch(() => ({}));
+        console.error(`Google Forms batchUpdate error in section ${section.sectionNumber}:`, errorData);
+        
+        // If batch update failed, attempt safe fallback: insert as text questions
+        console.warn('Attempting simplified fallback for section', section.sectionNumber);
+        const fallbackRequests = sectionRequests.map((req) => {
+          if (req.createItem?.item?.questionItem) {
+            return {
+              createItem: {
+                item: {
+                  title: req.createItem.item.title,
+                  questionItem: {
+                    question: {
+                      required: req.createItem.item.questionItem.question.required,
+                      textQuestion: { paragraph: false },
+                    },
+                  },
+                },
+                location: req.createItem.location,
+              },
+            };
+          }
+          return req;
+        });
+
+        const fallbackRes = await fetch(
+          `https://forms.googleapis.com/v1/forms/${encodeURIComponent(formId)}:batchUpdate`,
+          {
+            method: 'POST',
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ requests: fallbackRequests }),
+          }
+        );
+
+        if (!fallbackRes.ok) {
+          const fallbackError = await fallbackRes.json().catch(() => ({}));
+          const errMsg =
+            fallbackError?.error?.message ||
+            errorData?.error?.message ||
+            `เกิดข้อผิดพลาดในการบันทึกคำถามส่วนที่ ${section.sectionNumber} (HTTP ${batchRes.status})`;
+          throw new Error(errMsg);
+        }
+      }
     }
-  );
-
-  if (!batchResponse.ok) {
-    const errorData = await batchResponse.json().catch(() => ({}));
-    const message =
-      errorData?.error?.message ||
-      `เกิดข้อผิดพลาดในการบันทึกคำถาม (HTTP ${batchResponse.status})`;
-    throw new Error(message);
   }
 
   onProgress?.('สร้างเสร็จสมบูรณ์ 100%! พร้อมเปิดใช้งาน', 100);

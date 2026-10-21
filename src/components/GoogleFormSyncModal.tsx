@@ -238,12 +238,17 @@ export const GoogleFormSyncModal: React.FC<GoogleFormSyncModalProps> = ({
 
               {/* Error Alert */}
               {errorMessage && (
-                <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-xs text-rose-800 flex items-start gap-2">
-                  <AlertCircle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
-                  <div>
-                    <span className="font-bold">เกิดข้อผิดพลาด: </span>
-                    {errorMessage}
+                <div className="p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-xs text-rose-900 space-y-2">
+                  <div className="flex items-start gap-2">
+                    <AlertCircle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
+                    <div>
+                      <span className="font-bold">เกิดข้อผิดพลาดในการสร้างผ่าน API: </span>
+                      <span>{errorMessage}</span>
+                    </div>
                   </div>
+                  <p className="text-[11px] text-slate-600 bg-white/70 p-2 rounded-lg border border-rose-100">
+                    💡 <strong>ทางเลือกแนะนำ:</strong> ท่านสามารถใช้แท็บ <strong>"ส่งออก / Apps Script"</strong> เพื่อคัดลอกโค้ดไปวางใน <a href="https://script.google.com" target="_blank" rel="noreferrer" className="text-amber-700 underline font-semibold">script.google.com</a> เพื่อสร้างแบบฟอร์มได้ 100% พร้อมระบบแนบไฟล์
+                  </p>
                 </div>
               )}
 

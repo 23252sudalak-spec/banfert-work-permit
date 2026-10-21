@@ -11,13 +11,15 @@ import { type User } from '../services/firebase';
 import { Language } from '../types/permit';
 import { getUIText } from '../data/translations';
 
+export type AppTab = 'permits' | 'editor' | 'specs' | 'matrix' | 'export';
+
 interface NavbarProps {
   user: User | null;
   onLogin: () => void;
   onLogout: () => void;
   isLoggingIn: boolean;
-  activeTab: 'specs' | 'simulator' | 'matrix' | 'export';
-  setActiveTab: (tab: 'specs' | 'simulator' | 'matrix' | 'export') => void;
+  activeTab: AppTab;
+  setActiveTab: (tab: AppTab) => void;
   onOpenDeployModal: () => void;
   currentLang: Language;
   onLanguageChange: (lang: Language) => void;
@@ -52,21 +54,24 @@ export const Navbar: React.FC<NavbarProps> = ({
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 sm:h-20">
           {/* Logo & System Brand */}
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-amber-500 via-orange-500 to-red-600 flex items-center justify-center shadow-md shadow-orange-500/20 ring-2 ring-amber-400/30">
+          <div
+            onClick={() => setActiveTab('permits')}
+            className="flex items-center gap-3 cursor-pointer group"
+          >
+            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-amber-500 via-orange-500 to-red-600 flex items-center justify-center shadow-md shadow-orange-500/20 ring-2 ring-amber-400/30 group-hover:scale-105 transition-transform">
               <ShieldCheck className="w-6 h-6 sm:w-7 sm:h-7 text-white" />
             </div>
             <div>
               <div className="flex items-center gap-2">
                 <span className="font-bold text-base sm:text-lg tracking-tight text-white">
-                  PTW System
+                  Permit to Work
                 </span>
                 <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30">
                   จป.วิชาชีพ
                 </span>
               </div>
               <p className="text-xs text-slate-400 hidden sm:block">
-                {getUIText('appSubtitle', currentLang)}
+                ระบบจัดการและบันทึกใบอนุญาตทำงานเสี่ยง (PTW Management)
               </p>
             </div>
           </div>
@@ -74,30 +79,40 @@ export const Navbar: React.FC<NavbarProps> = ({
           {/* Quick Action Navigation Tabs */}
           <div className="hidden lg:flex items-center gap-1 bg-slate-800/80 p-1 rounded-xl border border-slate-700/60 text-xs sm:text-sm">
             <button
+              onClick={() => setActiveTab('permits')}
+              className={`px-3.5 py-1.5 rounded-lg font-medium transition-all ${
+                activeTab === 'permits'
+                  ? 'bg-amber-500 text-slate-950 font-bold shadow'
+                  : 'text-slate-300 hover:text-white hover:bg-slate-700/50'
+              }`}
+            >
+              {getUIText('tabPermits', currentLang)}
+            </button>
+            <button
+              onClick={() => setActiveTab('editor')}
+              className={`px-3.5 py-1.5 rounded-lg font-medium transition-all ${
+                activeTab === 'editor'
+                  ? 'bg-amber-500 text-slate-950 font-bold shadow'
+                  : 'text-slate-300 hover:text-white hover:bg-slate-700/50'
+              }`}
+            >
+              {getUIText('tabEditor', currentLang)}
+            </button>
+            <button
               onClick={() => setActiveTab('specs')}
               className={`px-3.5 py-1.5 rounded-lg font-medium transition-all ${
                 activeTab === 'specs'
-                  ? 'bg-amber-500 text-slate-950 font-semibold shadow'
+                  ? 'bg-amber-500 text-slate-950 font-bold shadow'
                   : 'text-slate-300 hover:text-white hover:bg-slate-700/50'
               }`}
             >
               {getUIText('tabSpecs', currentLang)}
             </button>
             <button
-              onClick={() => setActiveTab('simulator')}
-              className={`px-3.5 py-1.5 rounded-lg font-medium transition-all ${
-                activeTab === 'simulator'
-                  ? 'bg-amber-500 text-slate-950 font-semibold shadow'
-                  : 'text-slate-300 hover:text-white hover:bg-slate-700/50'
-              }`}
-            >
-              {getUIText('tabSimulator', currentLang)}
-            </button>
-            <button
               onClick={() => setActiveTab('matrix')}
               className={`px-3.5 py-1.5 rounded-lg font-medium transition-all ${
                 activeTab === 'matrix'
-                  ? 'bg-amber-500 text-slate-950 font-semibold shadow'
+                  ? 'bg-amber-500 text-slate-950 font-bold shadow'
                   : 'text-slate-300 hover:text-white hover:bg-slate-700/50'
               }`}
             >
@@ -107,7 +122,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               onClick={() => setActiveTab('export')}
               className={`px-3.5 py-1.5 rounded-lg font-medium transition-all ${
                 activeTab === 'export'
-                  ? 'bg-amber-500 text-slate-950 font-semibold shadow'
+                  ? 'bg-amber-500 text-slate-950 font-bold shadow'
                   : 'text-slate-300 hover:text-white hover:bg-slate-700/50'
               }`}
             >
@@ -236,6 +251,26 @@ export const Navbar: React.FC<NavbarProps> = ({
         {/* Mobile Navigation */}
         <div className="flex lg:hidden overflow-x-auto py-2.5 gap-2 border-t border-slate-800 text-xs no-scrollbar">
           <button
+            onClick={() => setActiveTab('permits')}
+            className={`whitespace-nowrap px-3 py-1.5 rounded-lg ${
+              activeTab === 'permits'
+                ? 'bg-amber-500 text-slate-950 font-bold'
+                : 'text-slate-300 bg-slate-800'
+            }`}
+          >
+            {getUIText('tabPermits', currentLang)}
+          </button>
+          <button
+            onClick={() => setActiveTab('editor')}
+            className={`whitespace-nowrap px-3 py-1.5 rounded-lg ${
+              activeTab === 'editor'
+                ? 'bg-amber-500 text-slate-950 font-bold'
+                : 'text-slate-300 bg-slate-800'
+            }`}
+          >
+            {getUIText('tabEditor', currentLang)}
+          </button>
+          <button
             onClick={() => setActiveTab('specs')}
             className={`whitespace-nowrap px-3 py-1.5 rounded-lg ${
               activeTab === 'specs'
@@ -244,16 +279,6 @@ export const Navbar: React.FC<NavbarProps> = ({
             }`}
           >
             {getUIText('tabSpecs', currentLang)}
-          </button>
-          <button
-            onClick={() => setActiveTab('simulator')}
-            className={`whitespace-nowrap px-3 py-1.5 rounded-lg ${
-              activeTab === 'simulator'
-                ? 'bg-amber-500 text-slate-950 font-bold'
-                : 'text-slate-300 bg-slate-800'
-            }`}
-          >
-            {getUIText('tabSimulator', currentLang)}
           </button>
           <button
             onClick={() => setActiveTab('matrix')}

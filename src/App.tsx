@@ -4,15 +4,24 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { Navbar } from './components/Navbar';
+import { Navbar, AppTab } from './components/Navbar';
+import { PermitList } from './components/PermitList';
+import { PermitFormEditor } from './components/PermitFormEditor';
+import { PermitDetailModal } from './components/PermitDetailModal';
 import { SectionViewer } from './components/SectionViewer';
-import { InteractiveSimulator } from './components/InteractiveSimulator';
 import { RiskMatrixCard } from './components/RiskMatrixCard';
 import { ExportModal } from './components/ExportModal';
 import { GoogleFormSyncModal } from './components/GoogleFormSyncModal';
 import { PERMIT_FORM_SECTIONS } from './data/permitTemplate';
 import { getLocalizedSections } from './utils/permitLocalization';
-import { Language } from './types/permit';
+import { Language, PermitRecord, PermitStatus } from './types/permit';
+import {
+  loadPermits,
+  savePermit as storageSavePermit,
+  deletePermit as storageDeletePermit,
+  updatePermitStatus as storageUpdateStatus,
+  createBlankPermit,
+} from './services/permitStorage';
 import {
   initAuth,
   googleSignIn,
@@ -24,10 +33,22 @@ export default function App() {
   const [user, setUser] = useState<User | null>(null);
   const [accessToken, setAccessToken] = useState<string | null>(null);
   const [isLoggingIn, setIsLoggingIn] = useState(false);
-  const [activeTab, setActiveTab] = useState<'specs' | 'simulator' | 'matrix' | 'export'>('specs');
+  const [activeTab, setActiveTab] = useState<AppTab>('permits');
   const [isDeployModalOpen, setIsDeployModalOpen] = useState(false);
   const [currentLang, setCurrentLang] = useState<Language>('th');
 
+  // Permits state
+  const [permits, setPermits] = useState<PermitRecord[]>([]);
+  const [editingPermit, setEditingPermit] = useState<PermitRecord>(createBlankPermit());
+  const [viewingPermit, setViewingPermit] = useState<PermitRecord | null>(null);
+
+  // Load permits on app start
+  useEffect(() => {
+    const loaded = loadPermits();
+    setPermits(loaded);
+  }, []);
+
+  // Listen to Auth state
   useEffect(() => {
     const unsubscribe = initAuth(
       (currentUser, token) => {
@@ -67,6 +88,37 @@ export default function App() {
     }
   };
 
+  // Permit Actions
+  const handleCreateNew = () => {
+    const blank = createBlankPermit();
+    setEditingPermit(blank);
+    setActiveTab('editor');
+  };
+
+  const handleSelectForEdit = (permit: PermitRecord) => {
+    setEditingPermit(permit);
+    setActiveTab('editor');
+  };
+
+  const handleSavePermit = (saved: PermitRecord) => {
+    const updated = storageSavePermit(saved);
+    const refreshed = loadPermits();
+    setPermits(refreshed);
+    setEditingPermit(updated);
+  };
+
+  const handleDeletePermit = (id: string) => {
+    storageDeletePermit(id);
+    const refreshed = loadPermits();
+    setPermits(refreshed);
+  };
+
+  const handleUpdateStatus = (id: string, status: PermitStatus) => {
+    storageUpdateStatus(id, status);
+    const refreshed = loadPermits();
+    setPermits(refreshed);
+  };
+
   const localizedSections = getLocalizedSections(PERMIT_FORM_SECTIONS, currentLang);
 
   return (
@@ -86,6 +138,27 @@ export default function App() {
 
       {/* Main Container */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+        {activeTab === 'permits' && (
+          <PermitList
+            permits={permits}
+            onSelectPermitForEdit={handleSelectForEdit}
+            onSelectPermitForView={(p) => setViewingPermit(p)}
+            onCreateNewPermit={handleCreateNew}
+            onDeletePermit={handleDeletePermit}
+            onUpdateStatus={handleUpdateStatus}
+            currentLang={currentLang}
+          />
+        )}
+
+        {activeTab === 'editor' && (
+          <PermitFormEditor
+            initialPermit={editingPermit}
+            onSave={handleSavePermit}
+            onCancel={() => setActiveTab('permits')}
+            currentLang={currentLang}
+          />
+        )}
+
         {activeTab === 'specs' && (
           <SectionViewer
             sections={localizedSections}
@@ -96,13 +169,7 @@ export default function App() {
           />
         )}
 
-        {activeTab === 'simulator' && (
-          <InteractiveSimulator currentLang={currentLang} />
-        )}
-
-        {activeTab === 'matrix' && (
-          <RiskMatrixCard currentLang={currentLang} />
-        )}
+        {activeTab === 'matrix' && <RiskMatrixCard currentLang={currentLang} />}
 
         {activeTab === 'export' && (
           <ExportModal
@@ -119,21 +186,31 @@ export default function App() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="space-y-1 text-center sm:text-left">
             <p className="font-semibold text-slate-200">
-              ระบบออกแบบและสร้าง Google Form ใบอนุญาตปฏิบัติงานที่มีความเสี่ยง (Permit to Work - PTW)
+              ระบบบริหารจัดการใบอนุญาตปฏิบัติงานที่มีความเสี่ยง (Permit to Work System - PTW)
             </p>
             <p className="text-[11px] text-slate-400">
-              รองรับ 3 ภาษา: ไทย (Thai) 🇹🇭 • จีน (中文) 🇨🇳 • พม่า (မြန်မာ) 🇲🇲 | ตามมาตรฐาน จป.วิชาชีพ และ ISO 45001
+              รองรับการกรอก บันทึก แก้ไข ติดตามสถานะ อนุมัติ และพิมพ์เอกสารตามมาตรฐาน จป.วิชาชีพ
             </p>
           </div>
           <div className="flex items-center gap-3 text-[11px] text-slate-400">
             <span className="px-2 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700">
-              Language: {currentLang.toUpperCase()}
+              Active Permits: {permits.length}
             </span>
             <span>•</span>
-            <span>Google Forms API v1</span>
+            <span>มาตรฐาน พ.ร.บ.ความปลอดภัยฯ 2554</span>
           </div>
         </div>
       </footer>
+
+      {/* Viewing & Printable Permit Modal */}
+      <PermitDetailModal
+        permit={viewingPermit}
+        onClose={() => setViewingPermit(null)}
+        onEdit={(p) => {
+          setEditingPermit(p);
+          setActiveTab('editor');
+        }}
+      />
 
       {/* Google Form 1-Click Deployment Modal */}
       <GoogleFormSyncModal
