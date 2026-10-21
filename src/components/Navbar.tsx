@@ -4,8 +4,12 @@ import {
   CheckCircle2,
   ChevronDown,
   Plus,
+  LogOut,
+  User,
+  Mail,
 } from 'lucide-react';
 import { Language } from '../types/permit';
+import { QQUser } from '../types/qqUser';
 import { getUIText } from '../data/translations';
 
 export type AppTab = 'permits' | 'editor' | 'specs' | 'matrix' | 'export';
@@ -16,6 +20,9 @@ interface NavbarProps {
   onNewPermit: () => void;
   currentLang: Language;
   onLanguageChange: (lang: Language) => void;
+  qqUser: QQUser | null;
+  onOpenQQLogin: () => void;
+  onLogoutQQ: () => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
@@ -24,8 +31,12 @@ export const Navbar: React.FC<NavbarProps> = ({
   onNewPermit,
   currentLang,
   onLanguageChange,
+  qqUser,
+  onOpenQQLogin,
+  onLogoutQQ,
 }) => {
   const [isLangMenuOpen, setIsLangMenuOpen] = useState(false);
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
 
   const mainLangs: { id: Language; label: string; flag: string }[] = [
     { id: 'th', label: 'ไทย', flag: '🇹🇭' },
@@ -191,12 +202,107 @@ export const Navbar: React.FC<NavbarProps> = ({
               </div>
             </div>
 
+            {/* QQ Mail Authentication Status or Login Button */}
+            {qqUser ? (
+              <div className="relative">
+                <button
+                  onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
+                  className="h-9 flex items-center gap-2 px-2.5 bg-slate-800 hover:bg-slate-700/80 border border-slate-700 text-white rounded-xl text-xs font-semibold transition-all shrink-0"
+                >
+                  <div className="w-5 h-5 rounded-lg bg-blue-600 text-white flex items-center justify-center font-bold text-[10px]">
+                    QQ
+                  </div>
+                  <span className="font-bold text-slate-200 hidden md:inline truncate max-w-[120px]">
+                    {qqUser.nickname.split(' ')[0]}
+                  </span>
+                  <span className="px-1.5 py-0.2 rounded bg-blue-500/20 text-blue-300 text-[10px] hidden sm:inline">
+                    {qqUser.role === 'safety_officer' ? 'จป.' : 'ผู้รับเหมา'}
+                  </span>
+                  <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
+                </button>
+
+                {isUserMenuOpen && (
+                  <>
+                    <div
+                      className="fixed inset-0 z-30"
+                      onClick={() => setIsUserMenuOpen(false)}
+                    />
+                    <div className="absolute right-0 mt-2 w-64 bg-slate-800 border border-slate-700 rounded-2xl shadow-2xl py-3 px-3 z-40 text-xs text-slate-200 animate-fadeIn space-y-2.5">
+                      <div className="flex items-center gap-2.5 border-b border-slate-700/80 pb-2.5">
+                        <div className="w-9 h-9 rounded-xl bg-blue-600 text-white flex items-center justify-center font-black text-sm shrink-0">
+                          QQ
+                        </div>
+                        <div className="min-w-0">
+                          <p className="font-bold text-white text-xs truncate">
+                            {qqUser.nickname}
+                          </p>
+                          <p className="text-[11px] text-blue-300 font-mono truncate">
+                            {qqUser.email}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="space-y-1 text-[11px] text-slate-300">
+                        <div className="flex items-center justify-between">
+                          <span className="text-slate-400">บทบาท / 职务:</span>
+                          <span className="font-semibold text-amber-300">
+                            {qqUser.roleTitle[currentLang === 'zh' ? 'zh' : currentLang === 'my' ? 'my' : 'th']}
+                          </span>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span className="text-slate-400">สังกัด / 单位:</span>
+                          <span className="font-medium text-slate-300 truncate max-w-[140px]" title={qqUser.company}>
+                            {qqUser.company}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="border-t border-slate-700/80 pt-2 flex items-center justify-between gap-2">
+                        <button
+                          onClick={() => {
+                            setIsUserMenuOpen(false);
+                            onOpenQQLogin();
+                          }}
+                          className="flex-1 py-1.5 px-2 bg-slate-700 hover:bg-slate-600 text-slate-200 rounded-lg text-[11px] font-semibold text-center transition-colors"
+                        >
+                          สลับบัญชี (切换)
+                        </button>
+                        <button
+                          onClick={() => {
+                            setIsUserMenuOpen(false);
+                            onLogoutQQ();
+                          }}
+                          className="py-1.5 px-2.5 bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 rounded-lg text-[11px] font-bold transition-colors flex items-center gap-1"
+                          title={getUIText('signOut', currentLang)}
+                        >
+                          <LogOut className="w-3.5 h-3.5" />
+                          <span>{getUIText('signOut', currentLang)}</span>
+                        </button>
+                      </div>
+                    </div>
+                  </>
+                )}
+              </div>
+            ) : (
+              <button
+                onClick={onOpenQQLogin}
+                className="h-9 flex items-center gap-1.5 px-3 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-bold shadow-md shadow-blue-600/20 transition-all hover:scale-[1.02] active:scale-95 shrink-0"
+                title="เข้าสู่ระบบด้วย QQ Mail (QQ 邮箱登录)"
+              >
+                <span className="w-4 h-4 rounded bg-white text-blue-600 text-[10px] font-black flex items-center justify-center font-sans">
+                  QQ
+                </span>
+                <span className="hidden md:inline">{getUIText('signInQQMail', currentLang)}</span>
+                <span className="md:hidden">{getUIText('signInQQShort', currentLang)}</span>
+              </button>
+            )}
+
             {/* Direct New Permit CTA Button */}
             <button
               onClick={onNewPermit}
-              className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-bold text-xs sm:text-sm rounded-xl shadow-md shadow-amber-500/20 transition-all hover:scale-[1.02] active:scale-[0.98]"
+              className="h-9 flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-bold text-xs sm:text-sm rounded-xl shadow-md shadow-amber-500/20 transition-all hover:scale-[1.02] active:scale-[0.98] shrink-0"
             >
-              <Plus className="w-4 h-4 text-slate-950" />
+              <Plus className="w-4 h-4 text-slate-950 shrink-0" />
               <span className="hidden sm:inline">{getUIText('createNewPermitBtn', currentLang)}</span>
               <span className="sm:hidden">
                 {currentLang === 'zh' ? '新建' : currentLang === 'my' ? 'အသစ်' : 'เพิ่มใบ'}

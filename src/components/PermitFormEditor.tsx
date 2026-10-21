@@ -9,6 +9,7 @@ import {
   Check,
 } from 'lucide-react';
 import { PermitRecord, Language, PermitStatus } from '../types/permit';
+import { QQUser } from '../types/qqUser';
 import { calculateRiskLevel } from '../services/permitStorage';
 import {
   getUIText,
@@ -22,6 +23,7 @@ interface PermitFormEditorProps {
   onSave: (savedPermit: PermitRecord) => void;
   onCancel: () => void;
   currentLang: Language;
+  qqUser?: QQUser | null;
 }
 
 export const PermitFormEditor: React.FC<PermitFormEditorProps> = ({
@@ -29,6 +31,7 @@ export const PermitFormEditor: React.FC<PermitFormEditorProps> = ({
   onSave,
   onCancel,
   currentLang,
+  qqUser,
 }) => {
   const [formData, setFormData] = useState<PermitRecord>(initialPermit);
   const [activeSection, setActiveSection] = useState<number>(1);
@@ -331,6 +334,39 @@ export const PermitFormEditor: React.FC<PermitFormEditorProps> = ({
               {getUIText('requiredNote', currentLang)}
             </span>
           </div>
+
+          {/* QQ Mail User Quick-Fill Bar */}
+          {qqUser && (
+            <div className="p-3 bg-blue-50/80 border border-blue-200 rounded-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs">
+              <div className="flex items-center gap-2.5">
+                <div className="w-7 h-7 rounded-lg bg-blue-600 text-white font-bold text-xs flex items-center justify-center shrink-0">
+                  QQ
+                </div>
+                <div>
+                  <span className="font-bold text-blue-950 block">
+                    {qqUser.nickname} ({qqUser.email})
+                  </span>
+                  <span className="text-[11px] text-blue-700">
+                    {qqUser.company} • {qqUser.roleTitle[currentLang === 'zh' ? 'zh' : currentLang === 'my' ? 'my' : 'th']}
+                  </span>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  updateField('applicantName', qqUser.nickname);
+                  updateField('company', qqUser.company);
+                  updateField('phone', qqUser.phone);
+                  if (qqUser.role === 'safety_officer') {
+                    updateField('safetyOfficerName', qqUser.nickname);
+                  }
+                }}
+                className="h-8 px-3 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-lg text-xs transition-colors shrink-0 flex items-center gap-1 shadow-sm"
+              >
+                <span>{getUIText('prefillFromQQ', currentLang)}</span>
+              </button>
+            </div>
+          )}
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
             {/* 1.1 Applicant Name */}

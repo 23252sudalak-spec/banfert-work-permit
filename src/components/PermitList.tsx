@@ -361,6 +361,12 @@ export const PermitList: React.FC<PermitListProps> = ({
                       <span className="text-xs text-slate-400 block mt-0.5">
                         📞 {permit.phone} ({permit.workerCount} {getUIText('personsCount', currentLang)})
                       </span>
+                      {permit.createdByEmail && (
+                        <span className="inline-flex items-center gap-1 mt-1 px-1.5 py-0.2 rounded bg-blue-50 text-blue-700 text-[10px] font-mono border border-blue-200">
+                          <span>QQ:</span>
+                          <span className="truncate max-w-[130px]">{permit.createdByEmail}</span>
+                        </span>
+                      )}
                     </td>
 
                     {/* Location & Summary */}

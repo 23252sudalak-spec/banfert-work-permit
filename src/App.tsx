@@ -15,6 +15,9 @@ import { PERMIT_FORM_SECTIONS } from './data/permitTemplate';
 import { getLocalizedSections } from './utils/permitLocalization';
 import { getUIText } from './data/translations';
 import { Language, PermitRecord, PermitStatus } from './types/permit';
+import { QQUser } from './types/qqUser';
+import { getSavedQQUser, clearQQUserSession } from './services/qqAuthService';
+import { QQMailAuthModal } from './components/QQMailAuthModal';
 import {
   loadPermits,
   savePermit as storageSavePermit,
@@ -27,20 +30,43 @@ export default function App() {
   const [activeTab, setActiveTab] = useState<AppTab>('permits');
   const [currentLang, setCurrentLang] = useState<Language>('th');
 
+  // QQ Mail Auth State
+  const [qqUser, setQQUser] = useState<QQUser | null>(null);
+  const [isQQModalOpen, setIsQQModalOpen] = useState<boolean>(false);
+
   // Permits state
   const [permits, setPermits] = useState<PermitRecord[]>([]);
   const [editingPermit, setEditingPermit] = useState<PermitRecord>(createBlankPermit());
   const [viewingPermit, setViewingPermit] = useState<PermitRecord | null>(null);
 
-  // Load permits on app start
+  // Load permits and QQ user on app start
   useEffect(() => {
     const loaded = loadPermits();
     setPermits(loaded);
+    const savedUser = getSavedQQUser();
+    if (savedUser) {
+      setQQUser(savedUser);
+    }
   }, []);
+
+  const handleLogoutQQ = () => {
+    clearQQUserSession();
+    setQQUser(null);
+  };
 
   // Permit Actions
   const handleCreateNew = () => {
     const blank = createBlankPermit();
+    if (qqUser) {
+      blank.createdByEmail = qqUser.email;
+      if (qqUser.role === 'safety_officer') {
+        blank.safetyOfficerName = qqUser.nickname;
+      } else {
+        blank.applicantName = qqUser.nickname;
+        blank.company = qqUser.company;
+        blank.phone = qqUser.phone;
+      }
+    }
     setEditingPermit(blank);
     setActiveTab('editor');
   };
@@ -89,6 +115,9 @@ export default function App() {
         onNewPermit={handleCreateNew}
         currentLang={currentLang}
         onLanguageChange={setCurrentLang}
+        qqUser={qqUser}
+        onOpenQQLogin={() => setIsQQModalOpen(true)}
+        onLogoutQQ={handleLogoutQQ}
       />
 
       {/* Main Container */}
@@ -111,6 +140,7 @@ export default function App() {
             onSave={handleSavePermit}
             onCancel={() => setActiveTab('permits')}
             currentLang={currentLang}
+            qqUser={qqUser}
           />
         )}
 
@@ -162,6 +192,16 @@ export default function App() {
         onEdit={(p) => {
           setEditingPermit(p);
           setActiveTab('editor');
+        }}
+        currentLang={currentLang}
+      />
+
+      {/* Tencent QQ Mail Auth Modal */}
+      <QQMailAuthModal
+        isOpen={isQQModalOpen}
+        onClose={() => setIsQQModalOpen(false)}
+        onLoginSuccess={(user) => {
+          setQQUser(user);
         }}
         currentLang={currentLang}
       />

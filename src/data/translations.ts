@@ -56,21 +56,16 @@ export const UI_TRANSLATIONS: Record<string, TranslationItem> = {
     my: '📤 ထုတ်ယူ/ပုံနှိပ်',
   },
 
-  // Auth & Top bar buttons
-  createGoogleFormBtn: {
-    th: 'สร้างลง Google Forms ทันที',
-    zh: '一键生成 Google 表单',
-    my: 'Google Forms သို့ ဖန်တီးပါ',
+  // QQ Mail Auth & User Profile
+  signInQQMail: {
+    th: 'เข้าสู่ระบบด้วย QQ Mail (จีน)',
+    zh: 'QQ 邮箱登录',
+    my: 'QQ Mail ဖြင့် အကောင့်ဝင်ပါ',
   },
-  createFormShort: {
-    th: 'สร้าง Form',
-    zh: '生成表单',
-    my: 'ဖောင်လုပ်ရန်',
-  },
-  signInGoogle: {
-    th: 'เข้าสู่ระบบด้วย Google',
-    zh: '使用 Google 账号登录',
-    my: 'Google ဖြင့် အကောင့်ဝင်ပါ',
+  signInQQShort: {
+    th: 'QQ Mail',
+    zh: 'QQ 登录',
+    my: 'QQ Mail',
   },
   signOut: {
     th: 'ออกจากระบบ',
@@ -78,9 +73,104 @@ export const UI_TRANSLATIONS: Record<string, TranslationItem> = {
     my: 'အကောင့်ထွက်ပါ',
   },
   connectedAccount: {
-    th: 'บัญชีที่เชื่อมต่อ:',
-    zh: '当前关联账号:',
-    my: 'ချိတ်ဆက်ထားသော အကောင့် -',
+    th: 'บัญชี QQ Mail ที่เข้าสู่ระบบ:',
+    zh: '当前登录 QQ 邮箱账号:',
+    my: 'လောလောဆယ်ဝင်ထားသော QQ Mail -',
+  },
+  qqMailModalTitle: {
+    th: 'เข้าใช้งานผ่าน QQ Mail ของจีน (Tencent QQ 邮箱)',
+    zh: '腾讯 QQ 邮箱安全认证登录',
+    my: 'တရုတ်နိုင်ငံ Tencent QQ Mail ဖြင့် အကောင့်ဝင်ခြင်း',
+  },
+  qqMailModalDesc: {
+    th: 'รองรับการเข้าใช้งานด้วยอีเมล @qq.com และ @foxmail.com สำหรับวิศวกรจีนและ จป.วิชาชีพในไซต์งาน',
+    zh: '支持 @qq.com 与 @foxmail.com 账号认证，专为中泰工程项目现场工程师与安全官设计',
+    my: 'ဆိုက်အင်ဂျင်နီယာနှင့် လုံခြုံရေးအရာရှိများအတွက် @qq.com နှင့် @foxmail.com အကောင့်များ အသုံးပြုနိုင်သည်',
+  },
+  tabQQPassword: {
+    th: '🔑 รหัสผ่าน QQ Mail',
+    zh: '🔑 账号密码登录',
+    my: '🔑 အကောင့်နှင့် စကားဝှက်',
+  },
+  tabQQCode: {
+    th: '✉️ รหัสยืนยัน OTP (QQ Mail)',
+    zh: '✉️ 邮箱验证码登录',
+    my: '✉️ အီးမေးလ် OTP ကုဒ်',
+  },
+  tabQQQrCode: {
+    th: '📱 สแกน QR Code (QQ 扫码)',
+    zh: '📱 手机 QQ 扫码登录',
+    my: '📱 QQ QR Code စကင်န်ဖတ်ခြင်း',
+  },
+  labelQQEmail: {
+    th: 'หมายเลข QQ หรืออีเมล QQ Mail:',
+    zh: 'QQ 账号 / 邮箱地址:',
+    my: 'QQ နံပါတ် / အီးမေးလ်လိပ်စာ -',
+  },
+  placeholderQQEmail: {
+    th: 'เช่น 238914829 หรือ user@qq.com',
+    zh: '请输入 QQ 号或 @qq.com / @foxmail.com',
+    my: 'ဥပမာ 238914829 သို့မဟုတ် user@qq.com',
+  },
+  labelQQPassword: {
+    th: 'รหัสผ่าน QQ Mail / รหัสยืนยันตัวตน (授权码):',
+    zh: 'QQ 邮箱密码 / 独立授权码:',
+    my: 'QQ Mail စကားဝှက် သို့မဟုတ် လုံခြုံရေးကုဒ် -',
+  },
+  placeholderQQPassword: {
+    th: 'กรอกรหัสผ่าน QQ Mail หรือรหัสผ่านอิสระ',
+    zh: '请输入 QQ 密码或邮箱授权码',
+    my: 'QQ စကားဝှက် ရိုက်ထည့်ပါ',
+  },
+  labelQQCode: {
+    th: 'รหัสยืนยัน 6 หลักที่ส่งไปที่ QQ Mail:',
+    zh: '邮箱收到的 6 位数字验证码:',
+    my: 'QQ Mail သို့ ပေးပို့သော ဂဏန်း ၆ လုံးကုဒ် -',
+  },
+  placeholderQQCode: {
+    th: 'กรอกรหัส 6 หลัก (เช่น 888888)',
+    zh: '请输入 6 位验证码 (如 888888)',
+    my: 'ဂဏန်း ၆ လုံးကုဒ် ထည့်ပါ (ဥပမာ 888888)',
+  },
+  btnGetCode: {
+    th: 'ส่งรหัสยืนยัน',
+    zh: '获取验证码',
+    my: 'ကုဒ်ရယူပါ',
+  },
+  btnResendCode: {
+    th: 'ส่งรหัสใหม่ใน',
+    zh: '重新发送',
+    my: 'ပြန်လည်ပို့ရန်',
+  },
+  btnLoginQQ: {
+    th: 'ยืนยันเข้าสู่ระบบ QQ Mail',
+    zh: '立即登录 QQ 邮箱',
+    my: 'QQ Mail ဖြင့် အကောင့်ဝင်ရန် အတည်ပြုပါ',
+  },
+  quickDemoAccounts: {
+    th: 'บัญชีทดสอบด่วนของวิศวกร / จป. (1-Click Demo Accounts):',
+    zh: '工程项目与安全官快捷登录账号体验:',
+    my: 'စမ်းသပ်အသုံးပြုနိုင်သော အကောင့်များ (1-Click Demo) -',
+  },
+  scanQrInstruction: {
+    th: 'เปิดแอป QQ หรือ Weixin/WeChat บนมือถือแล้วสแกน QR Code นี้เพื่อเข้าใช้งานทันที',
+    zh: '请使用手机 QQ 或企业微信扫描下方二维码以安全授权登录',
+    my: 'လုံခြုံစွာ အကောင့်ဝင်ရန် ဖုန်း QQ သို့မဟုတ် WeChat ဖြင့် စကင်န်ဖတ်ပါ',
+  },
+  scanQrSimulateBtn: {
+    th: 'จำลองการสแกนผ่านมือถือสำเร็จ',
+    zh: '模拟手机端已确认授权',
+    my: 'ဖုန်းဖြင့် စကင်န်ဖတ်ပြီး အတည်ပြုသည်ဟု စမ်းသပ်ပါ',
+  },
+  userProfileHeading: {
+    th: 'ข้อมูลโปรไฟล์ผู้ใช้งาน QQ Mail',
+    zh: 'QQ 邮箱用户安全认证信息',
+    my: 'QQ Mail အသုံးပြုသူ လုံခြုံရေးအချက်အလက်',
+  },
+  prefillFromQQ: {
+    th: 'ดึงข้อมูลจากบัญชี QQ Mail อัตโนมัติ',
+    zh: '自动导入当前 QQ 账号信息',
+    my: 'လက်ရှိ QQ အကောင့်မှ အချက်အလက်များ ဖြည့်ပါ',
   },
   readyToCreate: {
     th: 'พร้อมสร้าง',
