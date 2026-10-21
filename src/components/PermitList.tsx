@@ -3,7 +3,6 @@ import {
   FileText,
   Plus,
   Search,
-  Filter,
   CheckCircle2,
   Clock,
   AlertCircle,
@@ -11,18 +10,10 @@ import {
   Edit3,
   Eye,
   Trash2,
-  Printer,
-  ShieldCheck,
-  Flame,
-  Box,
-  TrendingUp,
-  Zap,
-  Truck,
-  RotateCcw,
   Check,
 } from 'lucide-react';
 import { PermitRecord, PermitStatus, Language } from '../types/permit';
-import { formatBilingualText } from '../data/translations';
+import { getUIText } from '../data/translations';
 
 interface PermitListProps {
   permits: PermitRecord[];
@@ -80,7 +71,9 @@ export const PermitList: React.FC<PermitListProps> = ({
   // Stats calculation
   const totalCount = permits.length;
   const pendingCount = permits.filter((p) => p.status === 'pending_approval').length;
-  const approvedCount = permits.filter((p) => p.status === 'approved' || p.status === 'work_in_progress').length;
+  const approvedCount = permits.filter(
+    (p) => p.status === 'approved' || p.status === 'work_in_progress'
+  ).length;
   const closedCount = permits.filter((p) => p.status === 'closed').length;
 
   const getStatusBadge = (status: PermitStatus) => {
@@ -89,62 +82,102 @@ export const PermitList: React.FC<PermitListProps> = ({
         return (
           <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
             <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-            อนุมัติแล้ว (Approved)
+            {getUIText('statusApproved', currentLang)}
           </span>
         );
       case 'pending_approval':
         return (
           <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-100 text-amber-800 border border-amber-300">
             <Clock className="w-3.5 h-3.5 text-amber-600 animate-pulse" />
-            รออนุมัติ (Pending)
+            {getUIText('statusPending', currentLang)}
           </span>
         );
       case 'conditional':
         return (
           <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-yellow-100 text-yellow-800 border border-yellow-300">
             <AlertCircle className="w-3.5 h-3.5 text-yellow-600" />
-            อนุมัติตามเงื่อนไข
+            {getUIText('statusConditional', currentLang)}
           </span>
         );
       case 'work_in_progress':
         return (
           <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-blue-100 text-blue-800 border border-blue-300">
             <Clock className="w-3.5 h-3.5 text-blue-600" />
-            กำลังปฏิบัติงาน (Active)
+            {getUIText('statusActive', currentLang)}
           </span>
         );
       case 'closed':
         return (
           <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-slate-100 text-slate-700 border border-slate-300">
             <Check className="w-3.5 h-3.5 text-slate-500" />
-            ปิดงานแล้ว (Closed)
+            {getUIText('statusClosed', currentLang)}
           </span>
         );
       case 'rejected':
         return (
           <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-rose-100 text-rose-800 border border-rose-300">
             <XCircle className="w-3.5 h-3.5 text-rose-600" />
-            ไม่อนุมัติ (Rejected)
+            {getUIText('statusRejected', currentLang)}
           </span>
         );
       default:
         return (
           <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-600">
-            ฉบับร่าง (Draft)
+            {getUIText('statusDraft', currentLang)}
           </span>
         );
     }
   };
 
   const getRiskIcon = (r: string) => {
-    if (r.includes('ความร้อน') || r.includes('Hot')) return '🔥';
-    if (r.includes('อับอากาศ') || r.includes('Confined')) return '📦';
-    if (r.includes('บนที่สูง') || r.includes('Heights')) return '🧗';
-    if (r.includes('ไฟฟ้า') || r.includes('Electrical')) return '⚡';
-    if (r.includes('ขุด') || r.includes('Lifting')) return '🏗️';
-    if (r.includes('เคมี') || r.includes('Chemical')) return '☣️';
+    if (r.includes('ความร้อน') || r.includes('Hot') || r.includes('动火') || r.includes('မီးပွား')) return '🔥';
+    if (r.includes('อับอากาศ') || r.includes('Confined') || r.includes('有限空间') || r.includes('ကျဉ်းကျပ်')) return '📦';
+    if (r.includes('บนที่สูง') || r.includes('Heights') || r.includes('高处') || r.includes('အမြင့်')) return '🧗';
+    if (r.includes('ไฟฟ้า') || r.includes('Electrical') || r.includes('电') || r.includes('လျှပ်စစ်')) return '⚡';
+    if (r.includes('ขุด') || r.includes('Lifting') || r.includes('吊装') || r.includes('မြေတူး')) return '🏗️';
+    if (r.includes('เคมี') || r.includes('Chemical') || r.includes('化') || r.includes('ဓာတု')) return '☣️';
     return '⚠️';
   };
+
+  // Status Filter Options
+  const statusOptions = [
+    { value: 'all', label: getUIText('allStatuses', currentLang) },
+    { value: 'pending_approval', label: `⏳ ${getUIText('statusPending', currentLang)}` },
+    { value: 'approved', label: `✅ ${getUIText('statusApproved', currentLang)}` },
+    { value: 'work_in_progress', label: `👷 ${getUIText('statusActive', currentLang)}` },
+    { value: 'closed', label: `🏁 ${getUIText('statusClosed', currentLang)}` },
+    { value: 'rejected', label: `❌ ${getUIText('statusRejected', currentLang)}` },
+    { value: 'draft', label: `📝 ${getUIText('statusDraft', currentLang)}` },
+  ];
+
+  // Risk Filter Options
+  const riskOptions = [
+    { value: 'all', label: getUIText('allRiskTypes', currentLang) },
+    {
+      value: 'ความร้อน',
+      label: currentLang === 'zh' ? '🔥 动火与热工作业 (Hot Work)' : currentLang === 'my' ? '🔥 မီးပွား/အပူထွက်သောအလုပ် (Hot Work)' : '🔥 งานประกายไฟ (Hot Work)',
+    },
+    {
+      value: 'อับอากาศ',
+      label: currentLang === 'zh' ? '📦 有限空间作业 (Confined Space)' : currentLang === 'my' ? '📦 ကျဉ်းကျပ်သောနေရာ (Confined Space)' : '📦 งานที่อับอากาศ (Confined Space)',
+    },
+    {
+      value: 'บนที่สูง',
+      label: currentLang === 'zh' ? '🧗 高处坠落作业 (Heights)' : currentLang === 'my' ? '🧗 အမြင့်တွင်အလုပ်လုပ်ခြင်း (Heights)' : '🧗 งานบนที่สูง (Heights)',
+    },
+    {
+      value: 'ไฟฟ้า',
+      label: currentLang === 'zh' ? '⚡ 电气与高压作业 (Electrical)' : currentLang === 'my' ? '⚡ လျှပ်စစ်လုပ်ငန်းများ (Electrical)' : '⚡ งานระบบไฟฟ้า (Electrical)',
+    },
+    {
+      value: 'ขุด',
+      label: currentLang === 'zh' ? '🏗️ 动土开挖与起重 (Excavation/Lifting)' : currentLang === 'my' ? '🏗️ မြေတူး/အလေးမခြင်း (Excavation/Lifting)' : '🏗️ งานขุดเจาะ/ยกของ (Excavation/Lifting)',
+    },
+    {
+      value: 'เคมี',
+      label: currentLang === 'zh' ? '☣️ 危险化学品作业 (Chemicals)' : currentLang === 'my' ? '☣️ ဓာတုပစ္စည်းလုပ်ငန်း (Chemicals)' : '☣️ งานสารเคมีอันตราย (Chemicals)',
+    },
+  ];
 
   return (
     <div className="space-y-6">
@@ -152,9 +185,13 @@ export const PermitList: React.FC<PermitListProps> = ({
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         <div className="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
           <div>
-            <span className="text-xs font-semibold text-slate-500 block">ใบอนุญาตทั้งหมด</span>
+            <span className="text-xs font-semibold text-slate-500 block">
+              {getUIText('totalPermitsStat', currentLang)}
+            </span>
             <span className="text-2xl font-black text-slate-900 mt-1 block">{totalCount}</span>
-            <span className="text-[11px] text-slate-400">Total Permits</span>
+            <span className="text-[11px] text-slate-400">
+              {getUIText('totalPermitsSub', currentLang)}
+            </span>
           </div>
           <div className="w-11 h-11 rounded-2xl bg-slate-100 text-slate-700 flex items-center justify-center">
             <FileText className="w-5 h-5" />
@@ -163,9 +200,13 @@ export const PermitList: React.FC<PermitListProps> = ({
 
         <div className="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
           <div>
-            <span className="text-xs font-semibold text-amber-600 block">รอการพิจารณาอนุมัติ</span>
+            <span className="text-xs font-semibold text-amber-600 block">
+              {getUIText('pendingReviewStat', currentLang)}
+            </span>
             <span className="text-2xl font-black text-amber-600 mt-1 block">{pendingCount}</span>
-            <span className="text-[11px] text-slate-400">Pending Review</span>
+            <span className="text-[11px] text-slate-400">
+              {getUIText('pendingReviewSub', currentLang)}
+            </span>
           </div>
           <div className="w-11 h-11 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center border border-amber-200">
             <Clock className="w-5 h-5 animate-pulse" />
@@ -174,9 +215,13 @@ export const PermitList: React.FC<PermitListProps> = ({
 
         <div className="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
           <div>
-            <span className="text-xs font-semibold text-emerald-600 block">อนุมัติแล้ว / ใช้งานอยู่</span>
+            <span className="text-xs font-semibold text-emerald-600 block">
+              {getUIText('approvedActiveStat', currentLang)}
+            </span>
             <span className="text-2xl font-black text-emerald-600 mt-1 block">{approvedCount}</span>
-            <span className="text-[11px] text-slate-400">Approved & Active</span>
+            <span className="text-[11px] text-slate-400">
+              {getUIText('approvedActiveSub', currentLang)}
+            </span>
           </div>
           <div className="w-11 h-11 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center border border-emerald-200">
             <CheckCircle2 className="w-5 h-5" />
@@ -185,9 +230,13 @@ export const PermitList: React.FC<PermitListProps> = ({
 
         <div className="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
           <div>
-            <span className="text-xs font-semibold text-slate-500 block">ปิดใบอนุญาตแล้ว</span>
+            <span className="text-xs font-semibold text-slate-500 block">
+              {getUIText('closedPermitStat', currentLang)}
+            </span>
             <span className="text-2xl font-black text-slate-700 mt-1 block">{closedCount}</span>
-            <span className="text-[11px] text-slate-400">Permit Closed</span>
+            <span className="text-[11px] text-slate-400">
+              {getUIText('closedPermitSub', currentLang)}
+            </span>
           </div>
           <div className="w-11 h-11 rounded-2xl bg-slate-100 text-slate-500 flex items-center justify-center border border-slate-200">
             <Check className="w-5 h-5" />
@@ -204,7 +253,7 @@ export const PermitList: React.FC<PermitListProps> = ({
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="ค้นหาตามเลขที่ PTW, ชื่อผู้ขอ, บริษัท, หรือสถานที่..."
+            placeholder={getUIText('searchPermitPlaceholder', currentLang)}
             className="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:bg-white focus:outline-none focus:ring-2 focus:ring-amber-500"
           />
         </div>
@@ -216,13 +265,11 @@ export const PermitList: React.FC<PermitListProps> = ({
             onChange={(e) => setStatusFilter(e.target.value)}
             className="px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700 font-semibold focus:outline-none"
           >
-            <option value="all">สถานะทั้งหมด</option>
-            <option value="pending_approval">⏳ รออนุมัติ (Pending)</option>
-            <option value="approved">✅ อนุมัติแล้ว (Approved)</option>
-            <option value="work_in_progress">👷 กำลังปฏิบัติงาน (Active)</option>
-            <option value="closed">🏁 ปิดงานแล้ว (Closed)</option>
-            <option value="rejected">❌ ไม่อนุมัติ (Rejected)</option>
-            <option value="draft">📝 ฉบับร่าง (Draft)</option>
+            {statusOptions.map((opt) => (
+              <option key={opt.value} value={opt.value}>
+                {opt.label}
+              </option>
+            ))}
           </select>
 
           {/* Risk Type Dropdown */}
@@ -231,13 +278,11 @@ export const PermitList: React.FC<PermitListProps> = ({
             onChange={(e) => setRiskFilter(e.target.value)}
             className="px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700 font-semibold focus:outline-none hidden sm:block"
           >
-            <option value="all">ประเภทงานทั้งหมด</option>
-            <option value="ความร้อน">🔥 งานประกายไฟ (Hot Work)</option>
-            <option value="อับอากาศ">📦 งานที่อับอากาศ (Confined)</option>
-            <option value="บนที่สูง">🧗 งานบนที่สูง (Heights)</option>
-            <option value="ไฟฟ้า">⚡ งานระบบไฟฟ้า (Electrical)</option>
-            <option value="ขุด">🏗️ งานขุดเจาะ/ยกของ</option>
-            <option value="เคมี">☣️ งานสารเคมีอันตราย</option>
+            {riskOptions.map((opt) => (
+              <option key={opt.value} value={opt.value}>
+                {opt.label}
+              </option>
+            ))}
           </select>
 
           {/* New Permit Button */}
@@ -246,7 +291,7 @@ export const PermitList: React.FC<PermitListProps> = ({
             className="flex items-center gap-2 px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs rounded-xl shadow-md transition-all hover:scale-105 active:scale-95 whitespace-nowrap"
           >
             <Plus className="w-4 h-4 text-amber-400" />
-            <span>กรอกใบขออนุญาตใหม่</span>
+            <span>{getUIText('createNewPermitBtn', currentLang)}</span>
           </button>
         </div>
       </div>
@@ -258,15 +303,17 @@ export const PermitList: React.FC<PermitListProps> = ({
             <div className="w-12 h-12 rounded-2xl bg-slate-100 text-slate-400 flex items-center justify-center mx-auto">
               <FileText className="w-6 h-6" />
             </div>
-            <h4 className="font-bold text-slate-700 text-sm">ไม่พบข้อมูลใบอนุญาตทำงาน</h4>
+            <h4 className="font-bold text-slate-700 text-sm">
+              {getUIText('emptyPermitsTitle', currentLang)}
+            </h4>
             <p className="text-xs text-slate-400 max-w-sm mx-auto">
-              ไม่พบรายการที่ตรงกับเงื่อนไขการค้นหา สามารถกดเพิ่มใบอนุญาตใหม่ได้ทันที
+              {getUIText('emptyPermitsDesc', currentLang)}
             </p>
             <button
               onClick={onCreateNewPermit}
               className="px-4 py-2 bg-slate-900 text-white text-xs font-bold rounded-xl shadow"
             >
-              + กรอกใบอนุญาตฉบับใหม่
+              {getUIText('emptyPermitsCreateBtn', currentLang)}
             </button>
           </div>
         ) : (
@@ -274,12 +321,12 @@ export const PermitList: React.FC<PermitListProps> = ({
             <table className="w-full text-left text-xs border-collapse">
               <thead>
                 <tr className="bg-slate-100/70 text-slate-600 border-b border-slate-200 font-bold">
-                  <th className="p-3.5 pl-4">เลขที่ / วันที่</th>
-                  <th className="p-3.5">ผู้ขออนุญาต & บริษัท</th>
-                  <th className="p-3.5">สถานที่ & ลักษณะงาน</th>
-                  <th className="p-3.5">ประเภทงานเสี่ยง</th>
-                  <th className="p-3.5">สถานะ</th>
-                  <th className="p-3.5 pr-4 text-right">การจัดการ</th>
+                  <th className="p-3.5 pl-4">{getUIText('colPermitNoDate', currentLang)}</th>
+                  <th className="p-3.5">{getUIText('colApplicantCompany', currentLang)}</th>
+                  <th className="p-3.5">{getUIText('colLocationWork', currentLang)}</th>
+                  <th className="p-3.5">{getUIText('colRiskTypes', currentLang)}</th>
+                  <th className="p-3.5">{getUIText('colStatus', currentLang)}</th>
+                  <th className="p-3.5 pr-4 text-right">{getUIText('colActions', currentLang)}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
@@ -297,7 +344,7 @@ export const PermitList: React.FC<PermitListProps> = ({
                         📅 {permit.workDate}
                       </span>
                       <span className="text-[10px] text-slate-400 block">
-                        ⏰ {permit.startTime} - {permit.endTime} น.
+                        ⏰ {permit.startTime} - {permit.endTime}
                       </span>
                     </td>
 
@@ -310,7 +357,7 @@ export const PermitList: React.FC<PermitListProps> = ({
                         {permit.company}
                       </span>
                       <span className="text-[10px] text-slate-400 block mt-0.5">
-                        📞 {permit.phone} ({permit.workerCount} คน)
+                        📞 {permit.phone} ({permit.workerCount} {getUIText('personsCount', currentLang)})
                       </span>
                     </td>
 
@@ -354,7 +401,7 @@ export const PermitList: React.FC<PermitListProps> = ({
                       {getStatusBadge(permit.status)}
                       {permit.safetyOfficerName && (
                         <span className="block text-[10px] text-slate-400 mt-1 truncate max-w-[140px]">
-                          ผู้อนุมัติ: {permit.safetyOfficerName.split(' ')[0]}
+                          {getUIText('approverLabel', currentLang)} {permit.safetyOfficerName.split(' ')[0]}
                         </span>
                       )}
                     </td>
@@ -366,7 +413,7 @@ export const PermitList: React.FC<PermitListProps> = ({
                         <button
                           onClick={() => onSelectPermitForView(permit)}
                           className="p-1.5 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors"
-                          title="ดูรายละเอียดและพิมพ์ใบอนุญาต"
+                          title={getUIText('actionViewPrint', currentLang)}
                         >
                           <Eye className="w-4 h-4" />
                         </button>
@@ -375,7 +422,7 @@ export const PermitList: React.FC<PermitListProps> = ({
                         <button
                           onClick={() => onSelectPermitForEdit(permit)}
                           className="p-1.5 rounded-lg text-slate-600 hover:text-amber-600 hover:bg-amber-50 transition-colors"
-                          title="แก้ไขข้อมูลใบอนุญาต"
+                          title={getUIText('actionEdit', currentLang)}
                         >
                           <Edit3 className="w-4 h-4" />
                         </button>
@@ -385,7 +432,7 @@ export const PermitList: React.FC<PermitListProps> = ({
                           <button
                             onClick={() => onUpdateStatus(permit.id, 'approved')}
                             className="p-1.5 rounded-lg text-emerald-600 hover:bg-emerald-50 transition-colors font-bold text-[11px]"
-                            title="อนุมัติใบอนุญาตทันที"
+                            title={getUIText('actionQuickApprove', currentLang)}
                           >
                             <CheckCircle2 className="w-4 h-4" />
                           </button>
@@ -395,7 +442,7 @@ export const PermitList: React.FC<PermitListProps> = ({
                           <button
                             onClick={() => onUpdateStatus(permit.id, 'closed')}
                             className="p-1.5 rounded-lg text-slate-600 hover:bg-slate-100 transition-colors font-bold text-[11px]"
-                            title="ปิดใบอนุญาตเมื่อเสร็จงาน"
+                            title={getUIText('actionQuickClose', currentLang)}
                           >
                             <Check className="w-4 h-4" />
                           </button>
@@ -411,20 +458,20 @@ export const PermitList: React.FC<PermitListProps> = ({
                               }}
                               className="text-[10px] font-bold text-rose-700 px-1.5 py-0.5 bg-rose-200 rounded"
                             >
-                              ลบจริง
+                              {getUIText('confirmDelete', currentLang)}
                             </button>
                             <button
                               onClick={() => setDeleteConfirmId(null)}
                               className="text-[10px] text-slate-500 px-1"
                             >
-                              ไม่
+                              {getUIText('cancelDelete', currentLang)}
                             </button>
                           </div>
                         ) : (
                           <button
                             onClick={() => setDeleteConfirmId(permit.id)}
                             className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors"
-                            title="ลบใบอนุญาตนี้"
+                            title={getUIText('actionDelete', currentLang)}
                           >
                             <Trash2 className="w-4 h-4" />
                           </button>

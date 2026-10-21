@@ -35,8 +35,7 @@ export async function createGoogleFormFromSections(
 
   onProgress?.('กำลังสร้างเอกสาร Google Form...', 15);
 
-  // 1. Create the initial blank form
-  const createResponse = await fetch('https://forms.googleapis.com/v1/forms', {
+  let createResponse = await fetch('https://forms.googleapis.com/v1/forms', {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${accessToken}`,
@@ -49,12 +48,32 @@ export async function createGoogleFormFromSections(
     }),
   });
 
+  // If Google Forms API returns 500 Internal Error, retry once with a simple ASCII title
+  if (!createResponse.ok && createResponse.status === 500) {
+    console.warn('Google Forms API returned 500 with custom title, retrying with fallback title...');
+    createResponse = await fetch('https://forms.googleapis.com/v1/forms', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        info: {
+          title: 'Permit to Work (PTW) - Safety Permit',
+        },
+      }),
+    });
+  }
+
   if (!createResponse.ok) {
     const errorData = await createResponse.json().catch(() => ({}));
     console.error('Google Forms Create Error:', errorData);
-    const message =
-      errorData?.error?.message ||
-      `สร้าง Google Form ไม่สำเร็จ (HTTP ${createResponse.status})`;
+    let message = errorData?.error?.message;
+    if (message === 'Internal error' || createResponse.status === 500) {
+      message = 'Google Forms API ตอบกลับ Internal error (500): เกิดจากข้อจำกัดสิทธิ์ API ของบัญชี Google กรุณาใช้ทางเลือก "ส่งออก / Apps Script" เพื่อสร้างฟอร์มลง Google Drive ได้ 100%';
+    } else if (!message) {
+      message = `สร้าง Google Form ไม่สำเร็จ (HTTP ${createResponse.status})`;
+    }
     throw new Error(message);
   }
 

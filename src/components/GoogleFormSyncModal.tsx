@@ -12,7 +12,9 @@ import {
 } from 'lucide-react';
 import { FormSection, Language } from '../types/permit';
 import { createGoogleFormFromSections, CreateFormResult } from '../services/googleFormsApi';
+import { generateGoogleAppsScript } from '../services/appsScriptGenerator';
 import { getLocalizedSections } from '../utils/permitLocalization';
+import { getUIText } from '../data/translations';
 import { type User } from '../services/firebase';
 
 interface GoogleFormSyncModalProps {
@@ -44,6 +46,7 @@ export const GoogleFormSyncModal: React.FC<GoogleFormSyncModalProps> = ({
   const [result, setResult] = useState<CreateFormResult | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [copiedLink, setCopiedLink] = useState(false);
+  const [copiedScript, setCopiedScript] = useState(false);
 
   if (!isOpen) return null;
 
@@ -238,17 +241,47 @@ export const GoogleFormSyncModal: React.FC<GoogleFormSyncModalProps> = ({
 
               {/* Error Alert */}
               {errorMessage && (
-                <div className="p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-xs text-rose-900 space-y-2">
+                <div className="p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-xs text-rose-900 space-y-2.5">
                   <div className="flex items-start gap-2">
                     <AlertCircle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
                     <div>
-                      <span className="font-bold">เกิดข้อผิดพลาดในการสร้างผ่าน API: </span>
-                      <span>{errorMessage}</span>
+                      <span className="font-bold">
+                        {currentLang === 'zh'
+                          ? 'Google Forms API 提示:'
+                          : currentLang === 'my'
+                          ? 'Google Forms API အမှား -'
+                          : 'ข้อความจากระบบ Google Forms API: '}
+                      </span>
+                      <p className="mt-0.5 text-rose-800">{errorMessage}</p>
                     </div>
                   </div>
-                  <p className="text-[11px] text-slate-600 bg-white/70 p-2 rounded-lg border border-rose-100">
-                    💡 <strong>ทางเลือกแนะนำ:</strong> ท่านสามารถใช้แท็บ <strong>"ส่งออก / Apps Script"</strong> เพื่อคัดลอกโค้ดไปวางใน <a href="https://script.google.com" target="_blank" rel="noreferrer" className="text-amber-700 underline font-semibold">script.google.com</a> เพื่อสร้างแบบฟอร์มได้ 100% พร้อมระบบแนบไฟล์
-                  </p>
+                  <div className="p-3 rounded-xl bg-white border border-rose-200 text-slate-700 space-y-2">
+                    <p className="text-[11px] leading-relaxed">
+                      💡 <strong>ทางเลือกแนะนำ (100% สำเร็จ):</strong> คัดลอกโค้ด Google Apps Script ไปวางใน <a href="https://script.google.com" target="_blank" rel="noreferrer" className="text-amber-700 underline font-semibold">script.google.com</a> แล้วกด Run เพื่อสร้างแบบฟอร์มลง Google Drive ของคุณทันทีโดยตรง
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const script = generateGoogleAppsScript(getLocalizedSections(sections, formLang));
+                        navigator.clipboard.writeText(script);
+                        setCopiedScript(true);
+                        setTimeout(() => setCopiedScript(false), 2500);
+                      }}
+                      className="flex items-center justify-center gap-1.5 w-full py-2 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl text-xs shadow transition-all active:scale-95"
+                    >
+                      {copiedScript ? (
+                        <>
+                          <Check className="w-4 h-4 text-emerald-400" />
+                          <span className="text-emerald-300">คัดลอกโค้ด Apps Script แล้ว!</span>
+                        </>
+                      ) : (
+                        <>
+                          <Copy className="w-4 h-4 text-amber-400" />
+                          <span>📋 คัดลอกโค้ด Google Apps Script ทันที</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
                 </div>
               )}
 

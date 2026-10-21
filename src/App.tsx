@@ -14,6 +14,7 @@ import { ExportModal } from './components/ExportModal';
 import { GoogleFormSyncModal } from './components/GoogleFormSyncModal';
 import { PERMIT_FORM_SECTIONS } from './data/permitTemplate';
 import { getLocalizedSections } from './utils/permitLocalization';
+import { getUIText } from './data/translations';
 import { Language, PermitRecord, PermitStatus } from './types/permit';
 import {
   loadPermits,
@@ -186,18 +187,18 @@ export default function App() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="space-y-1 text-center sm:text-left">
             <p className="font-semibold text-slate-200">
-              ระบบบริหารจัดการใบอนุญาตปฏิบัติงานที่มีความเสี่ยง (Permit to Work System - PTW)
+              {getUIText('footerTitle', currentLang)}
             </p>
             <p className="text-[11px] text-slate-400">
-              รองรับการกรอก บันทึก แก้ไข ติดตามสถานะ อนุมัติ และพิมพ์เอกสารตามมาตรฐาน จป.วิชาชีพ
+              {getUIText('footerDesc', currentLang)}
             </p>
           </div>
           <div className="flex items-center gap-3 text-[11px] text-slate-400">
             <span className="px-2 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700">
-              Active Permits: {permits.length}
+              {getUIText('footerActiveCount', currentLang)} {permits.length}
             </span>
             <span>•</span>
-            <span>มาตรฐาน พ.ร.บ.ความปลอดภัยฯ 2554</span>
+            <span>{getUIText('footerStandard', currentLang)}</span>
           </div>
         </div>
       </footer>
@@ -210,6 +211,7 @@ export default function App() {
           setEditingPermit(p);
           setActiveTab('editor');
         }}
+        currentLang={currentLang}
       />
 
       {/* Google Form 1-Click Deployment Modal */}

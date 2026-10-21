@@ -38,16 +38,20 @@ export const Navbar: React.FC<NavbarProps> = ({
 }) => {
   const [isLangMenuOpen, setIsLangMenuOpen] = useState(false);
 
-  const langOptions: { id: Language; label: string; short: string; flag: string }[] = [
-    { id: 'th', label: 'ภาษาไทย (Thai)', short: 'TH', flag: '🇹🇭' },
-    { id: 'zh', label: '中文 (Chinese)', short: 'ZH', flag: '🇨🇳' },
-    { id: 'my', label: 'မြန်မာ (Burmese)', short: 'MY', flag: '🇲🇲' },
-    { id: 'bilingual_th_my', label: 'ไทย + พม่า (TH-MY คู่ขนาน)', short: 'TH/MY', flag: '🇹🇭🇲🇲' },
-    { id: 'bilingual_th_zh', label: 'ไทย + จีน (TH-ZH คู่ขนาน)', short: 'TH/ZH', flag: '🇹🇭🇨🇳' },
-    { id: 'trilingual', label: '3 ภาษา (ไทย-จีน-พม่า)', short: '3-LANG', flag: '🌐' },
+  const mainLangs: { id: Language; label: string; flag: string }[] = [
+    { id: 'th', label: 'ไทย', flag: '🇹🇭' },
+    { id: 'zh', label: '中文', flag: '🇨🇳' },
+    { id: 'my', label: 'မြန်မာ', flag: '🇲🇲' },
   ];
 
-  const currentLangObj = langOptions.find((l) => l.id === currentLang) || langOptions[0];
+  const allLangOptions: { id: Language; label: string; flag: string }[] = [
+    { id: 'th', label: 'ภาษาไทย (Thai)', flag: '🇹🇭' },
+    { id: 'zh', label: '中文 (Chinese)', flag: '🇨🇳' },
+    { id: 'my', label: 'မြန်မာ (Burmese)', flag: '🇲🇲' },
+    { id: 'bilingual_th_my', label: 'ไทย + พม่า (TH-MY)', flag: '🇹🇭🇲🇲' },
+    { id: 'bilingual_th_zh', label: 'ไทย + จีน (TH-ZH)', flag: '🇹🇭🇨🇳' },
+    { id: 'trilingual', label: '3 ภาษา (ไทย-จีน-พม่า)', flag: '🌐' },
+  ];
 
   return (
     <header className="bg-slate-900 border-b border-slate-800 text-white sticky top-0 z-40 shadow-lg">
@@ -67,11 +71,11 @@ export const Navbar: React.FC<NavbarProps> = ({
                   Permit to Work
                 </span>
                 <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30">
-                  จป.วิชาชีพ
+                  {getUIText('safetyOfficerBadge', currentLang)}
                 </span>
               </div>
               <p className="text-xs text-slate-400 hidden sm:block">
-                ระบบจัดการและบันทึกใบอนุญาตทำงานเสี่ยง (PTW Management)
+                {getUIText('brandDesc', currentLang)}
               </p>
             </div>
           </div>
@@ -130,67 +134,85 @@ export const Navbar: React.FC<NavbarProps> = ({
             </button>
           </div>
 
-          {/* Right Action: Language Switcher, Create Form & Google Auth */}
+          {/* Right Action: 3 Language Switcher Pills, Dropdown & Google Auth */}
           <div className="flex items-center gap-2 sm:gap-3">
-            {/* Multilingual Selector Dropdown */}
-            <div className="relative">
-              <button
-                onClick={() => setIsLangMenuOpen(!isLangMenuOpen)}
-                className="flex items-center gap-1.5 px-2.5 py-1.5 sm:px-3 sm:py-2 bg-slate-800 hover:bg-slate-700/80 text-slate-200 border border-slate-700 rounded-xl text-xs font-semibold shadow transition-all"
-                title="เปลี่ยนภาษา (ไทย / 中文 / မြန်မာ)"
-              >
-                <Globe className="w-4 h-4 text-amber-400" />
-                <span className="text-sm">{currentLangObj.flag}</span>
-                <span className="hidden sm:inline">{currentLangObj.short}</span>
-                <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
-              </button>
+            {/* Quick 3 Language Switcher Pills (Thai, Chinese, Burmese) */}
+            <div className="flex items-center bg-slate-800 p-0.5 rounded-xl border border-slate-700">
+              {mainLangs.map((lang) => (
+                <button
+                  key={lang.id}
+                  onClick={() => onLanguageChange(lang.id)}
+                  className={`flex items-center gap-1 px-2 py-1 sm:px-2.5 sm:py-1 rounded-lg text-xs font-bold transition-all ${
+                    currentLang === lang.id
+                      ? 'bg-amber-500 text-slate-950 shadow-sm'
+                      : 'text-slate-300 hover:text-white hover:bg-slate-700/60'
+                  }`}
+                  title={lang.label}
+                >
+                  <span>{lang.flag}</span>
+                  <span className="text-[11px] hidden sm:inline">{lang.label}</span>
+                </button>
+              ))}
 
-              {isLangMenuOpen && (
-                <>
-                  <div
-                    className="fixed inset-0 z-30"
-                    onClick={() => setIsLangMenuOpen(false)}
-                  />
-                  <div className="absolute right-0 mt-2 w-56 bg-slate-800 border border-slate-700 rounded-2xl shadow-2xl py-2 z-40 text-xs text-slate-200">
-                    <div className="px-3 py-1.5 text-[11px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-700/70 mb-1">
-                      เลือกภาษา (Language / ဘာသာစကား)
+              {/* More Languages Dropdown (Bilingual/Trilingual) */}
+              <div className="relative">
+                <button
+                  onClick={() => setIsLangMenuOpen(!isLangMenuOpen)}
+                  className="px-1.5 py-1 text-slate-400 hover:text-white hover:bg-slate-700/60 rounded-lg transition-colors"
+                  title="ตัวเลือกภาษาเพิ่มเติม (Bilingual/Trilingual)"
+                >
+                  <ChevronDown className="w-3.5 h-3.5" />
+                </button>
+
+                {isLangMenuOpen && (
+                  <>
+                    <div
+                      className="fixed inset-0 z-30"
+                      onClick={() => setIsLangMenuOpen(false)}
+                    />
+                    <div className="absolute right-0 mt-2 w-56 bg-slate-800 border border-slate-700 rounded-2xl shadow-2xl py-2 z-40 text-xs text-slate-200">
+                      <div className="px-3 py-1.5 text-[11px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-700/70 mb-1">
+                        {getUIText('selectLanguage', currentLang)}
+                      </div>
+                      {allLangOptions.map((opt) => (
+                        <button
+                          key={opt.id}
+                          onClick={() => {
+                            onLanguageChange(opt.id);
+                            setIsLangMenuOpen(false);
+                          }}
+                          className={`w-full text-left px-3.5 py-2 flex items-center justify-between hover:bg-slate-700/70 transition-colors ${
+                            currentLang === opt.id
+                              ? 'text-amber-400 font-bold bg-slate-700/40'
+                              : 'text-slate-300'
+                          }`}
+                        >
+                          <span className="flex items-center gap-2">
+                            <span className="text-base">{opt.flag}</span>
+                            <span>{opt.label}</span>
+                          </span>
+                          {currentLang === opt.id && (
+                            <CheckCircle2 className="w-3.5 h-3.5 text-amber-400" />
+                          )}
+                        </button>
+                      ))}
                     </div>
-                    {langOptions.map((opt) => (
-                      <button
-                        key={opt.id}
-                        onClick={() => {
-                          onLanguageChange(opt.id);
-                          setIsLangMenuOpen(false);
-                        }}
-                        className={`w-full text-left px-3.5 py-2 flex items-center justify-between hover:bg-slate-700/70 transition-colors ${
-                          currentLang === opt.id
-                            ? 'text-amber-400 font-bold bg-slate-700/40'
-                            : 'text-slate-300'
-                        }`}
-                      >
-                        <span className="flex items-center gap-2">
-                          <span className="text-base">{opt.flag}</span>
-                          <span>{opt.label}</span>
-                        </span>
-                        {currentLang === opt.id && (
-                          <CheckCircle2 className="w-3.5 h-3.5 text-amber-400" />
-                        )}
-                      </button>
-                    ))}
-                  </div>
-                </>
-              )}
+                  </>
+                )}
+              </div>
             </div>
 
+            {/* Create Google Form Button */}
             <button
               onClick={onOpenDeployModal}
               className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-medium text-xs sm:text-sm rounded-xl shadow-md shadow-emerald-900/30 transition-all border border-emerald-400/30 hover:scale-[1.02] active:scale-[0.98]"
             >
               <CloudLightning className="w-4 h-4 text-emerald-200 animate-pulse" />
               <span className="hidden sm:inline">{getUIText('createGoogleFormBtn', currentLang)}</span>
-              <span className="sm:hidden">สร้าง Form</span>
+              <span className="sm:hidden">{getUIText('createFormShort', currentLang)}</span>
             </button>
 
+            {/* Google Auth Status / Login */}
             {user ? (
               <div className="flex items-center gap-2 bg-slate-800/90 border border-slate-700 rounded-xl px-2.5 py-1.5">
                 {user.photoURL ? (
