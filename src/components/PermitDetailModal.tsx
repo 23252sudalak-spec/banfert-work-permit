@@ -78,19 +78,19 @@ export const PermitDetailModal: React.FC<PermitDetailModalProps> = ({
         </div>
 
         {/* Scrollable Content Body */}
-        <div className="p-6 overflow-y-auto space-y-6 text-xs font-['Prompt','Noto_Sans_Myanmar','Noto_Sans_SC',sans-serif]">
+        <div className="p-6 overflow-y-auto space-y-6 text-xs leading-normal">
           {/* Printable Safety Permit Header Container */}
           <div className="border-2 border-slate-900 rounded-2xl p-5 space-y-5 bg-white">
             {/* Title Block */}
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between border-b-2 border-slate-900 pb-4 gap-2">
               <div>
-                <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">
+                <span className="text-xs font-bold text-slate-500 uppercase tracking-wider block">
                   PERMIT TO WORK SYSTEM (PTW) • มาตรฐาน จป.วิชาชีพ
                 </span>
-                <h1 className="text-lg font-black text-slate-900">
+                <h1 className="text-lg font-black text-slate-900 mt-0.5">
                   {getUIText('printDocHeading', currentLang)}
                 </h1>
-                <p className="text-[11px] text-slate-500">
+                <p className="text-xs text-slate-500 mt-0.5">
                   ใบอนุญาตทำงานเสี่ยง • 危险作业许可证 • အန္တရာယ်ရှိသောအလုပ်လုပ်ကိုင်ခွင့်လက်မှတ်
                 </p>
               </div>
@@ -98,7 +98,7 @@ export const PermitDetailModal: React.FC<PermitDetailModalProps> = ({
               <div className="text-right self-start sm:self-auto border-t sm:border-t-0 sm:border-l-2 border-slate-900 pt-2 sm:pt-0 sm:pl-4">
                 <span className="text-xs font-mono font-bold block">{permit.permitNumber}</span>
                 <span
-                  className={`inline-block mt-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold uppercase ${
+                  className={`inline-block mt-1 px-2.5 py-0.5 rounded-full text-xs font-bold uppercase ${
                     permit.status === 'approved'
                       ? 'bg-emerald-100 text-emerald-800 border border-emerald-300'
                       : permit.status === 'pending_approval'

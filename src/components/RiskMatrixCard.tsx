@@ -85,7 +85,7 @@ export const RiskMatrixCard: React.FC<RiskMatrixCardProps> = ({ currentLang }) =
               Risk Score = Likelihood (1-5) × Severity (1-5)
             </p>
           </div>
-          <div className="flex items-center gap-2 text-[11px] font-semibold">
+          <div className="flex items-center gap-2 text-xs font-semibold">
             <span className="px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 border border-emerald-300">Low (1-4)</span>
             <span className="px-2 py-0.5 rounded bg-yellow-100 text-yellow-800 border border-yellow-300">Med (5-9)</span>
             <span className="px-2 py-0.5 rounded bg-orange-100 text-orange-800 border border-orange-300">High (10-15)</span>
@@ -113,7 +113,7 @@ export const RiskMatrixCard: React.FC<RiskMatrixCardProps> = ({ currentLang }) =
               { level: 1, name: '1. Negligible (เล็กน้อย)', scores: [1, 2, 3, 4, 5] },
             ].map((row, rIdx) => (
               <div key={rIdx} className="grid grid-cols-6 gap-1 py-0.5 text-center font-bold">
-                <div className="p-2 bg-slate-50 text-slate-700 font-semibold rounded text-left text-[11px] flex items-center">
+                <div className="p-2 bg-slate-50 text-slate-700 font-semibold rounded text-left text-xs flex items-center leading-snug">
                   {row.name}
                 </div>
                 {row.scores.map((score, sIdx) => {

@@ -1,6 +1,6 @@
 {
-  "name": "ระบบออกแบบและสร้าง Google Form ใบอนุญาตทำงานเสี่ยง (Permit to Work - จป.วิชาชีพ)",
-  "description": "เครื่องมือออกแบบและสร้าง Google Form ใบอนุญาตทำงานที่มีความเสี่ยง (Permit to Work - PTW) ตามมาตรฐาน จป.วิชาชีพ ครบทั้ง 4 หมวดหมู่ พร้อมเชื่อมต่อสร้างลง Google Forms ในคลิกเดียว",
+  "name": "ระบบจัดการใบอนุญาตทำงานเสี่ยง (Permit to Work - PTW)",
+  "description": "ระบบบันทึก จัดการ และอนุมัติใบอนุญาตทำงานที่มีความเสี่ยง (PTW) ตามมาตรฐาน จป.วิชาชีพ พร้อมรองรับ 3 ภาษา (ไทย, จีน, พม่า)",
   "requestFramePermissions": [],
   "majorCapabilities": [
     "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"

@@ -9,9 +9,9 @@ export interface TranslationItem {
 export const UI_TRANSLATIONS: Record<string, TranslationItem> = {
   // Brand & Header
   appTitle: {
-    th: 'ระบบออกแบบและสร้าง Google Form ใบอนุญาตทำงานเสี่ยง (PTW)',
-    zh: '危险作业安全许可 (PTW) Google 表单与管理系统',
-    my: 'အန္တရာယ်ရှိသောအလုပ်လုပ်ကိုင်ခွင့် (PTW) Google Form နှင့် စီမံခန့်ခွဲမှုစနစ်',
+    th: 'ระบบจัดการใบอนุญาตทำงานเสี่ยง (PTW)',
+    zh: '高危作业安全许可证管理系统 (PTW)',
+    my: 'အန္တရာယ်ရှိသောအလုပ်လုပ်ကိုင်ခွင့် စီမံခန့်ခွဲမှုစနစ် (PTW)',
   },
   appSubtitle: {
     th: 'ตามมาตรฐาน จป.วิชาชีพ & พ.ร.บ.ความปลอดภัย อาชีวอนามัยฯ 2554',
@@ -31,29 +31,29 @@ export const UI_TRANSLATIONS: Record<string, TranslationItem> = {
 
   // Tabs
   tabPermits: {
-    th: '📑 รายการใบอนุญาต (Dashboard)',
-    zh: '📑 许可证清单与看板',
-    my: '📑 ခွင့်ပြုချက်စာရင်း (Dashboard)',
+    th: '📑 รายการใบอนุญาต',
+    zh: '📑 许可证列表',
+    my: '📑 ခွင့်ပြုချက်စာရင်း',
   },
   tabEditor: {
     th: '➕ กรอก/แก้ไขใบอนุญาต',
     zh: '➕ 填报/编辑许可',
-    my: '➕ အသစ်ဖြည့်/ပြင်ဆင်ရန်',
+    my: '➕ ဖြည့်/ပြင်ဆင်ရန်',
   },
   tabSpecs: {
-    th: '📋 โครงสร้าง 4 หมวด Google Form',
-    zh: '📋 Google 表单 4 大模块规范',
-    my: '📋 Google Form ဖွဲ့စည်းပုံ အပိုင်း ၄ ခု',
+    th: '📋 มาตรฐาน 4 หมวด PTW',
+    zh: '📋 4大高危规范',
+    my: '📋 အန္တရာယ်လုပ်ငန်း ၄ မျိုး',
   },
   tabMatrix: {
-    th: '⚖️ Risk Matrix & กฎหมาย',
-    zh: '⚖️ 风险矩阵与安全法规',
-    my: '⚖️ Risk Matrix နှင့် ဥပဒေများ',
+    th: '⚖️ Risk Matrix',
+    zh: '⚖️ 风险评估矩阵',
+    my: '⚖️ Risk Matrix စနစ်',
   },
   tabExport: {
-    th: '📤 ส่งออก / Apps Script',
-    zh: '📤 导出 / Apps Script 脚本',
-    my: '📤 ထုတ်ယူခြင်း / Apps Script',
+    th: '📤 ส่งออก & พิมพ์',
+    zh: '📤 导出与打印',
+    my: '📤 ထုတ်ယူ/ပုံနှိပ်',
   },
 
   // Auth & Top bar buttons

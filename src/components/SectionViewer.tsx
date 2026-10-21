@@ -14,7 +14,6 @@ import { getUIText } from '../data/translations';
 
 interface SectionViewerProps {
   sections: FormSection[];
-  onOpenDeployModal: () => void;
   onOpenAppsScriptTab: () => void;
   currentLang: Language;
   onLanguageChange: (lang: Language) => void;
@@ -22,7 +21,6 @@ interface SectionViewerProps {
 
 export const SectionViewer: React.FC<SectionViewerProps> = ({
   sections,
-  onOpenDeployModal,
   onOpenAppsScriptTab,
   currentLang,
   onLanguageChange,
@@ -214,11 +212,17 @@ export const SectionViewer: React.FC<SectionViewerProps> = ({
             </button>
 
             <button
-              onClick={onOpenDeployModal}
+              onClick={onOpenAppsScriptTab}
               className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-5 py-2.5 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-bold text-xs sm:text-sm rounded-xl shadow-lg shadow-amber-500/25 transition-all hover:scale-[1.02] active:scale-95"
             >
               <ExternalLink className="w-4 h-4" />
-              <span>{getUIText('createGoogleFormBtn', currentLang)}</span>
+              <span>
+                {currentLang === 'zh'
+                  ? '查看脚本与导出'
+                  : currentLang === 'my'
+                  ? 'Script နှင့် Export ကြည့်ရန်'
+                  : 'ดูสคริปต์ & ส่งออกข้อมูล'}
+              </span>
             </button>
           </div>
         </div>
@@ -454,28 +458,37 @@ export const SectionViewer: React.FC<SectionViewerProps> = ({
         ))}
       </div>
 
-      {/* Bottom Action Footer for Google Forms Deployment */}
+      {/* Bottom Action Footer for Google Forms Structure */}
       <div className="bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 rounded-2xl p-6 text-slate-950 shadow-xl flex flex-col md:flex-row items-center justify-between gap-4">
         <div className="space-y-1 text-center md:text-left">
           <h3 className="text-lg font-bold">
-            สร้าง Google Form ในภาษาที่เลือก ({currentLang.toUpperCase()}) ลงใน Google Drive ทันที
+            {currentLang === 'zh'
+              ? `表单结构支持多语种 (${currentLang.toUpperCase()}) 随时导出使用`
+              : currentLang === 'my'
+              ? `Google Form ဖွဲ့စည်းပုံ (${currentLang.toUpperCase()}) အား ကူးယူအသုံးပြုနိုင်ပါသည်`
+              : `คัดลอกหรือส่งออกโครงสร้างเพื่อใช้สร้าง Google Form ในภาษา (${currentLang.toUpperCase()})`}
           </h3>
           <p className="text-xs sm:text-sm text-slate-900/80">
-            ระบบจะสร้างตามภาษาที่คุณเลือก (ไทย, จีน, พม่า หรือแบบ 2-3 ภาษาคู่ขนาน) เพื่อให้ผู้รับเหมาและคนงานทุกคนเข้าใจตรงกัน
+            {currentLang === 'zh'
+              ? '支持泰语、中文、缅甸语三语规范，符合泰国专业安全工程师 (จป.วิชาชีพ) 现场把关要求'
+              : currentLang === 'my'
+              ? 'ထိုင်း၊ တရုတ်၊ မြန်မာ ၃ ဘာသာဖြင့် ရရှိနိုင်ပြီး လုပ်ငန်းခွင်ဘေးအန္တရာယ်ကင်းရှင်းရေး စံနှုန်းများနှင့် ကိုက်ညီပါသည်'
+              : 'สามารถคัดลอกข้อคำถามไปสร้างใน Google Form ของท่านได้ทันที หรือใช้โค้ด Google Apps Script เพื่อสร้างอัตโนมัติ'}
           </p>
         </div>
         <div className="flex items-center gap-3 shrink-0">
           <button
-            onClick={onOpenAppsScriptTab}
-            className="px-4 py-2.5 bg-slate-900 text-white hover:bg-slate-800 text-xs sm:text-sm font-semibold rounded-xl shadow transition-all"
+            onClick={handleCopyAllStructure}
+            className="px-4 py-2.5 bg-slate-900 text-white hover:bg-slate-800 text-xs sm:text-sm font-semibold rounded-xl shadow transition-all flex items-center gap-1.5 active:scale-95"
           >
-            ดู Google Apps Script
+            {copiedAll ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4 text-amber-400" />}
+            <span>{copiedAll ? getUIText('copiedAllBtn', currentLang) : getUIText('copyAllBtn', currentLang)}</span>
           </button>
           <button
-            onClick={onOpenDeployModal}
+            onClick={onOpenAppsScriptTab}
             className="px-5 py-2.5 bg-white text-slate-950 hover:bg-amber-50 text-xs sm:text-sm font-bold rounded-xl shadow-lg transition-all hover:scale-105 active:scale-95"
           >
-            🚀 {getUIText('createGoogleFormBtn', currentLang)}
+            📤 {currentLang === 'zh' ? '查看 Apps Script 脚本' : currentLang === 'my' ? 'Apps Script ကြည့်ရန်' : 'ดู Google Apps Script'}
           </button>
         </div>
       </div>

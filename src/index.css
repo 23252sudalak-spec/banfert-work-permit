@@ -1,1 +1,118 @@
 @import "tailwindcss";
+
+/* -------------------------------------------------------------
+   Multilingual Typography System (Thai, Chinese, Burmese)
+   Ensures consistent optical sizing, balanced line-heights, 
+   and prevents layout jumping / shifting across translations.
+------------------------------------------------------------- */
+
+:root {
+  --font-thai: 'Prompt', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-chinese: 'Noto Sans SC', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+  --font-burmese: 'Noto Sans Myanmar', 'Padauk', system-ui, sans-serif;
+  --font-composite: 'Prompt', 'Noto Sans Myanmar', 'Noto Sans SC', system-ui, sans-serif;
+  
+  --base-line-height: 1.5;
+  --base-letter-spacing: 0;
+}
+
+/* Default / Thai Language */
+html,
+html[data-lang="th"],
+[data-lang="th"] {
+  font-family: var(--font-thai);
+  line-height: 1.52;
+  letter-spacing: -0.01em;
+}
+
+/* Chinese (Simplified) Typography */
+html[data-lang="zh"],
+[data-lang="zh"] {
+  font-family: var(--font-chinese);
+  line-height: 1.55;
+  letter-spacing: 0.02em;
+}
+
+/* Burmese (Myanmar) Typography - Accommodate tall ascenders, descenders, and stacked diacritics */
+html[data-lang="my"],
+[data-lang="my"] {
+  font-family: var(--font-burmese);
+  line-height: 1.68;
+  letter-spacing: 0.01em;
+}
+
+/* Bilingual & Trilingual Modes */
+html[data-lang="bilingual_th_my"],
+html[data-lang="bilingual_th_zh"],
+html[data-lang="trilingual"],
+[data-lang="bilingual_th_my"],
+[data-lang="bilingual_th_zh"],
+[data-lang="trilingual"] {
+  font-family: var(--font-composite);
+  line-height: 1.62;
+}
+
+body {
+  font-family: inherit;
+  line-height: inherit;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-feature-settings: "kern" 1;
+}
+
+/* Form Controls & Action Buttons: Inherit balanced font and line height */
+button,
+input,
+select,
+textarea,
+table {
+  font-family: inherit;
+}
+
+/* Optical scale balancing for Burmese to prevent squished loops & clipping */
+html[data-lang="my"] button,
+html[data-lang="my"] select,
+html[data-lang="my"] input {
+  line-height: 1.45;
+}
+
+/* Prevent micro-text from becoming illegibly tiny in Burmese or Chinese */
+html[data-lang="my"] .text-\[10px\],
+html[data-lang="my"] .text-\[11px\] {
+  font-size: 0.72rem !important;
+  line-height: 1.5 !important;
+}
+
+html[data-lang="zh"] .text-\[10px\],
+html[data-lang="zh"] .text-\[11px\] {
+  font-size: 0.72rem !important;
+  line-height: 1.45 !important;
+}
+
+/* Anti-Jumping Layout Utilities */
+.stable-stat-card {
+  min-height: 108px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: border-color 0.15s ease;
+}
+
+.stable-tab-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  min-height: 2.25rem;
+  line-height: 1.25;
+}
+
+/* Custom Scrollbars */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}

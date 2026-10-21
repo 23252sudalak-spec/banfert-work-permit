@@ -236,33 +236,33 @@ export const PermitFormEditor: React.FC<PermitFormEditorProps> = ({
         </div>
 
         {/* Action Buttons */}
-        <div className="flex flex-wrap items-center gap-2 w-full md:w-auto">
+        <div className="flex flex-wrap items-center gap-2 w-full md:w-auto shrink-0">
           <button
             onClick={() => handleValidateAndSave('draft')}
-            className="flex-1 md:flex-none flex items-center justify-center gap-1.5 px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition-all border border-slate-200"
+            className="flex-1 md:flex-none h-10 inline-flex items-center justify-center gap-1.5 px-3.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition-all border border-slate-200 whitespace-nowrap leading-none"
           >
             <span>{getUIText('btnSaveDraft', currentLang)}</span>
           </button>
 
           <button
             onClick={() => handleValidateAndSave('pending_approval')}
-            className="flex-1 md:flex-none flex items-center justify-center gap-1.5 px-4 py-2 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 text-xs font-bold rounded-xl shadow transition-all hover:scale-[1.02] active:scale-95"
+            className="flex-1 md:flex-none h-10 inline-flex items-center justify-center gap-1.5 px-4 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 text-xs font-bold rounded-xl shadow-sm transition-all hover:scale-[1.02] active:scale-95 whitespace-nowrap leading-none"
           >
-            <Send className="w-3.5 h-3.5" />
+            <Send className="w-3.5 h-3.5 shrink-0" />
             <span>{getUIText('btnSubmitReview', currentLang)}</span>
           </button>
 
           <button
             onClick={() => handleValidateAndSave('approved')}
-            className="flex-1 md:flex-none flex items-center justify-center gap-1.5 px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-xl shadow transition-all hover:scale-[1.02] active:scale-95"
+            className="flex-1 md:flex-none h-10 inline-flex items-center justify-center gap-1.5 px-4 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-xl shadow-sm transition-all hover:scale-[1.02] active:scale-95 whitespace-nowrap leading-none"
           >
-            <CheckCircle2 className="w-3.5 h-3.5" />
+            <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
             <span>{getUIText('btnApprovePermit', currentLang)}</span>
           </button>
 
           <button
             onClick={() => window.print()}
-            className="p-2 bg-slate-900 text-white hover:bg-slate-800 rounded-xl transition-colors"
+            className="h-10 w-10 inline-flex items-center justify-center bg-slate-900 text-white hover:bg-slate-800 rounded-xl transition-colors shrink-0"
             title={getUIText('btnPrintPermit', currentLang)}
           >
             <Printer className="w-4 h-4" />
@@ -273,7 +273,7 @@ export const PermitFormEditor: React.FC<PermitFormEditorProps> = ({
       {/* Success Notification Banner */}
       {isSavedSuccess && (
         <div className="p-4 bg-emerald-50 border border-emerald-300 text-emerald-900 rounded-2xl flex items-center gap-2.5 text-xs font-bold shadow animate-fadeIn">
-          <CheckCircle2 className="w-5 h-5 text-emerald-600" />
+          <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
           <span>{getUIText('saveSuccessAlert', currentLang)}</span>
         </div>
       )}
@@ -287,7 +287,7 @@ export const PermitFormEditor: React.FC<PermitFormEditorProps> = ({
       )}
 
       {/* Section Jump Tabs */}
-      <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar bg-white p-2 rounded-2xl border border-slate-200 text-xs">
+      <div className="flex items-center gap-2 overflow-x-auto no-scrollbar bg-white p-2 rounded-2xl border border-slate-200 text-xs">
         {[
           { num: 1, key: 'secTab1' },
           { num: 2, key: 'secTab2' },
@@ -297,14 +297,14 @@ export const PermitFormEditor: React.FC<PermitFormEditorProps> = ({
           <button
             key={tab.num}
             onClick={() => setActiveSection(tab.num)}
-            className={`px-3 py-2 rounded-xl font-bold whitespace-nowrap transition-all flex items-center gap-1.5 ${
+            className={`h-10 px-3.5 rounded-xl font-bold whitespace-nowrap transition-all inline-flex items-center gap-2 shrink-0 leading-none ${
               activeSection === tab.num
-                ? 'bg-slate-900 text-white shadow'
+                ? 'bg-slate-900 text-white shadow-sm'
                 : 'text-slate-600 hover:bg-slate-100'
             }`}
           >
             <span
-              className={`w-4 h-4 rounded-full text-[10px] flex items-center justify-center font-bold ${
+              className={`w-5 h-5 rounded-full text-xs flex items-center justify-center font-bold shrink-0 ${
                 activeSection === tab.num
                   ? 'bg-amber-400 text-slate-950'
                   : 'bg-slate-200 text-slate-700'
@@ -312,7 +312,7 @@ export const PermitFormEditor: React.FC<PermitFormEditorProps> = ({
             >
               {tab.num}
             </span>
-            <span>{getUIText(tab.key, currentLang)}</span>
+            <span className="text-xs">{getUIText(tab.key, currentLang)}</span>
           </button>
         ))}
       </div>

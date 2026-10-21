@@ -11,7 +11,6 @@ import { PermitDetailModal } from './components/PermitDetailModal';
 import { SectionViewer } from './components/SectionViewer';
 import { RiskMatrixCard } from './components/RiskMatrixCard';
 import { ExportModal } from './components/ExportModal';
-import { GoogleFormSyncModal } from './components/GoogleFormSyncModal';
 import { PERMIT_FORM_SECTIONS } from './data/permitTemplate';
 import { getLocalizedSections } from './utils/permitLocalization';
 import { getUIText } from './data/translations';
@@ -23,19 +22,9 @@ import {
   updatePermitStatus as storageUpdateStatus,
   createBlankPermit,
 } from './services/permitStorage';
-import {
-  initAuth,
-  googleSignIn,
-  logout,
-  type User,
-} from './services/firebase';
 
 export default function App() {
-  const [user, setUser] = useState<User | null>(null);
-  const [accessToken, setAccessToken] = useState<string | null>(null);
-  const [isLoggingIn, setIsLoggingIn] = useState(false);
   const [activeTab, setActiveTab] = useState<AppTab>('permits');
-  const [isDeployModalOpen, setIsDeployModalOpen] = useState(false);
   const [currentLang, setCurrentLang] = useState<Language>('th');
 
   // Permits state
@@ -48,46 +37,6 @@ export default function App() {
     const loaded = loadPermits();
     setPermits(loaded);
   }, []);
-
-  // Listen to Auth state
-  useEffect(() => {
-    const unsubscribe = initAuth(
-      (currentUser, token) => {
-        setUser(currentUser);
-        setAccessToken(token);
-      },
-      () => {
-        setUser(null);
-        setAccessToken(null);
-      }
-    );
-    return () => unsubscribe();
-  }, []);
-
-  const handleLogin = async () => {
-    setIsLoggingIn(true);
-    try {
-      const result = await googleSignIn();
-      if (result) {
-        setUser(result.user);
-        setAccessToken(result.accessToken);
-      }
-    } catch (error) {
-      console.error('Login error:', error);
-    } finally {
-      setIsLoggingIn(false);
-    }
-  };
-
-  const handleLogout = async () => {
-    try {
-      await logout();
-      setUser(null);
-      setAccessToken(null);
-    } catch (error) {
-      console.error('Logout error:', error);
-    }
-  };
 
   // Permit Actions
   const handleCreateNew = () => {
@@ -120,19 +69,24 @@ export default function App() {
     setPermits(refreshed);
   };
 
+  // Sync HTML lang and data-lang attributes whenever currentLang changes
+  useEffect(() => {
+    document.documentElement.lang = currentLang;
+    document.documentElement.setAttribute('data-lang', currentLang);
+  }, [currentLang]);
+
   const localizedSections = getLocalizedSections(PERMIT_FORM_SECTIONS, currentLang);
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col font-['Prompt','Noto_Sans_Myanmar','Noto_Sans_SC',sans-serif]">
+    <div
+      data-lang={currentLang}
+      className="min-h-screen bg-slate-50 text-slate-900 flex flex-col transition-colors duration-150"
+    >
       {/* Top Navigation */}
       <Navbar
-        user={user}
-        onLogin={handleLogin}
-        onLogout={handleLogout}
-        isLoggingIn={isLoggingIn}
         activeTab={activeTab}
         setActiveTab={setActiveTab}
-        onOpenDeployModal={() => setIsDeployModalOpen(true)}
+        onNewPermit={handleCreateNew}
         currentLang={currentLang}
         onLanguageChange={setCurrentLang}
       />
@@ -163,7 +117,6 @@ export default function App() {
         {activeTab === 'specs' && (
           <SectionViewer
             sections={localizedSections}
-            onOpenDeployModal={() => setIsDeployModalOpen(true)}
             onOpenAppsScriptTab={() => setActiveTab('export')}
             currentLang={currentLang}
             onLanguageChange={setCurrentLang}
@@ -175,7 +128,6 @@ export default function App() {
         {activeTab === 'export' && (
           <ExportModal
             sections={PERMIT_FORM_SECTIONS}
-            onOpenDeployModal={() => setIsDeployModalOpen(true)}
             currentLang={currentLang}
             onLanguageChange={setCurrentLang}
           />
@@ -211,17 +163,6 @@ export default function App() {
           setEditingPermit(p);
           setActiveTab('editor');
         }}
-        currentLang={currentLang}
-      />
-
-      {/* Google Form 1-Click Deployment Modal */}
-      <GoogleFormSyncModal
-        isOpen={isDeployModalOpen}
-        onClose={() => setIsDeployModalOpen(false)}
-        sections={PERMIT_FORM_SECTIONS}
-        user={user}
-        accessToken={accessToken}
-        onLogin={handleLogin}
         currentLang={currentLang}
       />
     </div>

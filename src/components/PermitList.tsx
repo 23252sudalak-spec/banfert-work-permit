@@ -80,50 +80,50 @@ export const PermitList: React.FC<PermitListProps> = ({
     switch (status) {
       case 'approved':
         return (
-          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
-            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-            {getUIText('statusApproved', currentLang)}
+          <span className="h-6 inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800 border border-emerald-300 leading-none whitespace-nowrap">
+            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+            <span>{getUIText('statusApproved', currentLang)}</span>
           </span>
         );
       case 'pending_approval':
         return (
-          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-100 text-amber-800 border border-amber-300">
-            <Clock className="w-3.5 h-3.5 text-amber-600 animate-pulse" />
-            {getUIText('statusPending', currentLang)}
+          <span className="h-6 inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-100 text-amber-800 border border-amber-300 leading-none whitespace-nowrap">
+            <Clock className="w-3.5 h-3.5 text-amber-600 shrink-0 animate-pulse" />
+            <span>{getUIText('statusPending', currentLang)}</span>
           </span>
         );
       case 'conditional':
         return (
-          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-yellow-100 text-yellow-800 border border-yellow-300">
-            <AlertCircle className="w-3.5 h-3.5 text-yellow-600" />
-            {getUIText('statusConditional', currentLang)}
+          <span className="h-6 inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-800 border border-yellow-300 leading-none whitespace-nowrap">
+            <AlertCircle className="w-3.5 h-3.5 text-yellow-600 shrink-0" />
+            <span>{getUIText('statusConditional', currentLang)}</span>
           </span>
         );
       case 'work_in_progress':
         return (
-          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-blue-100 text-blue-800 border border-blue-300">
-            <Clock className="w-3.5 h-3.5 text-blue-600" />
-            {getUIText('statusActive', currentLang)}
+          <span className="h-6 inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-100 text-blue-800 border border-blue-300 leading-none whitespace-nowrap">
+            <Clock className="w-3.5 h-3.5 text-blue-600 shrink-0" />
+            <span>{getUIText('statusActive', currentLang)}</span>
           </span>
         );
       case 'closed':
         return (
-          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-slate-100 text-slate-700 border border-slate-300">
-            <Check className="w-3.5 h-3.5 text-slate-500" />
-            {getUIText('statusClosed', currentLang)}
+          <span className="h-6 inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-slate-100 text-slate-700 border border-slate-300 leading-none whitespace-nowrap">
+            <Check className="w-3.5 h-3.5 text-slate-500 shrink-0" />
+            <span>{getUIText('statusClosed', currentLang)}</span>
           </span>
         );
       case 'rejected':
         return (
-          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-rose-100 text-rose-800 border border-rose-300">
-            <XCircle className="w-3.5 h-3.5 text-rose-600" />
-            {getUIText('statusRejected', currentLang)}
+          <span className="h-6 inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-rose-100 text-rose-800 border border-rose-300 leading-none whitespace-nowrap">
+            <XCircle className="w-3.5 h-3.5 text-rose-600 shrink-0" />
+            <span>{getUIText('statusRejected', currentLang)}</span>
           </span>
         );
       default:
         return (
-          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-600">
-            {getUIText('statusDraft', currentLang)}
+          <span className="h-6 inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-600 leading-none whitespace-nowrap">
+            <span>{getUIText('statusDraft', currentLang)}</span>
           </span>
         );
     }
@@ -182,72 +182,73 @@ export const PermitList: React.FC<PermitListProps> = ({
   return (
     <div className="space-y-6">
       {/* Top Banner & Stats Overview */}
+      {/* Top Banner & Stats Overview */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-        <div className="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
-          <div>
-            <span className="text-xs font-semibold text-slate-500 block">
+        <div className="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between min-h-[105px]">
+          <div className="flex-1 pr-2">
+            <span className="text-xs font-semibold text-slate-500 block leading-tight">
               {getUIText('totalPermitsStat', currentLang)}
             </span>
-            <span className="text-2xl font-black text-slate-900 mt-1 block">{totalCount}</span>
-            <span className="text-[11px] text-slate-400">
+            <span className="text-2xl font-black text-slate-900 mt-1 block leading-none">{totalCount}</span>
+            <span className="text-xs text-slate-400 mt-1 block leading-tight">
               {getUIText('totalPermitsSub', currentLang)}
             </span>
           </div>
-          <div className="w-11 h-11 rounded-2xl bg-slate-100 text-slate-700 flex items-center justify-center">
+          <div className="w-11 h-11 rounded-2xl bg-slate-100 text-slate-700 flex items-center justify-center shrink-0">
             <FileText className="w-5 h-5" />
           </div>
         </div>
 
-        <div className="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
-          <div>
-            <span className="text-xs font-semibold text-amber-600 block">
+        <div className="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between min-h-[105px]">
+          <div className="flex-1 pr-2">
+            <span className="text-xs font-semibold text-amber-600 block leading-tight">
               {getUIText('pendingReviewStat', currentLang)}
             </span>
-            <span className="text-2xl font-black text-amber-600 mt-1 block">{pendingCount}</span>
-            <span className="text-[11px] text-slate-400">
+            <span className="text-2xl font-black text-amber-600 mt-1 block leading-none">{pendingCount}</span>
+            <span className="text-xs text-slate-400 mt-1 block leading-tight">
               {getUIText('pendingReviewSub', currentLang)}
             </span>
           </div>
-          <div className="w-11 h-11 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center border border-amber-200">
+          <div className="w-11 h-11 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center border border-amber-200 shrink-0">
             <Clock className="w-5 h-5 animate-pulse" />
           </div>
         </div>
 
-        <div className="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
-          <div>
-            <span className="text-xs font-semibold text-emerald-600 block">
+        <div className="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between min-h-[105px]">
+          <div className="flex-1 pr-2">
+            <span className="text-xs font-semibold text-emerald-600 block leading-tight">
               {getUIText('approvedActiveStat', currentLang)}
             </span>
-            <span className="text-2xl font-black text-emerald-600 mt-1 block">{approvedCount}</span>
-            <span className="text-[11px] text-slate-400">
+            <span className="text-2xl font-black text-emerald-600 mt-1 block leading-none">{approvedCount}</span>
+            <span className="text-xs text-slate-400 mt-1 block leading-tight">
               {getUIText('approvedActiveSub', currentLang)}
             </span>
           </div>
-          <div className="w-11 h-11 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center border border-emerald-200">
+          <div className="w-11 h-11 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center border border-emerald-200 shrink-0">
             <CheckCircle2 className="w-5 h-5" />
           </div>
         </div>
 
-        <div className="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
-          <div>
-            <span className="text-xs font-semibold text-slate-500 block">
+        <div className="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between min-h-[105px]">
+          <div className="flex-1 pr-2">
+            <span className="text-xs font-semibold text-slate-500 block leading-tight">
               {getUIText('closedPermitStat', currentLang)}
             </span>
-            <span className="text-2xl font-black text-slate-700 mt-1 block">{closedCount}</span>
-            <span className="text-[11px] text-slate-400">
+            <span className="text-2xl font-black text-slate-700 mt-1 block leading-none">{closedCount}</span>
+            <span className="text-xs text-slate-400 mt-1 block leading-tight">
               {getUIText('closedPermitSub', currentLang)}
             </span>
           </div>
-          <div className="w-11 h-11 rounded-2xl bg-slate-100 text-slate-500 flex items-center justify-center border border-slate-200">
+          <div className="w-11 h-11 rounded-2xl bg-slate-100 text-slate-500 flex items-center justify-center border border-slate-200 shrink-0">
             <Check className="w-5 h-5" />
           </div>
         </div>
       </div>
 
       {/* Control Bar: Search, Filters, and New Permit CTA */}
-      <div className="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
+      <div className="bg-white rounded-2xl border border-slate-200 p-3.5 shadow-sm flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
         {/* Search */}
-        <div className="relative flex-1 min-w-[220px]">
+        <div className="relative flex-1 min-w-[200px]">
           <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
           <input
             type="text"
@@ -258,12 +259,12 @@ export const PermitList: React.FC<PermitListProps> = ({
           />
         </div>
 
-        {/* Status Dropdown */}
-        <div className="flex items-center gap-2">
+        {/* Status & Risk Dropdowns */}
+        <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap">
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700 font-semibold focus:outline-none"
+            className="w-full sm:w-44 px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700 font-semibold focus:outline-none shrink-0"
           >
             {statusOptions.map((opt) => (
               <option key={opt.value} value={opt.value}>
@@ -276,7 +277,7 @@ export const PermitList: React.FC<PermitListProps> = ({
           <select
             value={riskFilter}
             onChange={(e) => setRiskFilter(e.target.value)}
-            className="px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700 font-semibold focus:outline-none hidden sm:block"
+            className="w-full sm:w-52 px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700 font-semibold focus:outline-none hidden sm:block shrink-0"
           >
             {riskOptions.map((opt) => (
               <option key={opt.value} value={opt.value}>
@@ -288,9 +289,9 @@ export const PermitList: React.FC<PermitListProps> = ({
           {/* New Permit Button */}
           <button
             onClick={onCreateNewPermit}
-            className="flex items-center gap-2 px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs rounded-xl shadow-md transition-all hover:scale-105 active:scale-95 whitespace-nowrap"
+            className="h-9 flex items-center justify-center gap-2 px-4 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs rounded-xl shadow-sm transition-all hover:scale-[1.02] active:scale-95 whitespace-nowrap shrink-0"
           >
-            <Plus className="w-4 h-4 text-amber-400" />
+            <Plus className="w-4 h-4 text-amber-400 shrink-0" />
             <span>{getUIText('createNewPermitBtn', currentLang)}</span>
           </button>
         </div>
@@ -321,12 +322,12 @@ export const PermitList: React.FC<PermitListProps> = ({
             <table className="w-full text-left text-xs border-collapse">
               <thead>
                 <tr className="bg-slate-100/70 text-slate-600 border-b border-slate-200 font-bold">
-                  <th className="p-3.5 pl-4">{getUIText('colPermitNoDate', currentLang)}</th>
-                  <th className="p-3.5">{getUIText('colApplicantCompany', currentLang)}</th>
-                  <th className="p-3.5">{getUIText('colLocationWork', currentLang)}</th>
-                  <th className="p-3.5">{getUIText('colRiskTypes', currentLang)}</th>
-                  <th className="p-3.5">{getUIText('colStatus', currentLang)}</th>
-                  <th className="p-3.5 pr-4 text-right">{getUIText('colActions', currentLang)}</th>
+                  <th className="p-3.5 pl-4 w-[170px] whitespace-nowrap">{getUIText('colPermitNoDate', currentLang)}</th>
+                  <th className="p-3.5 w-[210px] whitespace-nowrap">{getUIText('colApplicantCompany', currentLang)}</th>
+                  <th className="p-3.5 min-w-[200px]">{getUIText('colLocationWork', currentLang)}</th>
+                  <th className="p-3.5 w-[180px] whitespace-nowrap">{getUIText('colRiskTypes', currentLang)}</th>
+                  <th className="p-3.5 w-[150px] whitespace-nowrap">{getUIText('colStatus', currentLang)}</th>
+                  <th className="p-3.5 pr-4 w-[110px] text-right whitespace-nowrap">{getUIText('colActions', currentLang)}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
@@ -336,71 +337,72 @@ export const PermitList: React.FC<PermitListProps> = ({
                     className="hover:bg-slate-50/80 transition-colors group"
                   >
                     {/* Permit No & Date */}
-                    <td className="p-3.5 pl-4 align-top">
-                      <span className="font-mono font-bold text-slate-900 block">
+                    {/* Permit No & Date */}
+                    <td className="p-3.5 pl-4 align-top w-[170px]">
+                      <span className="font-mono font-bold text-slate-900 block text-xs">
                         {permit.permitNumber}
                       </span>
-                      <span className="text-[11px] text-slate-500 block mt-0.5">
+                      <span className="text-xs text-slate-500 block mt-0.5">
                         📅 {permit.workDate}
                       </span>
-                      <span className="text-[10px] text-slate-400 block">
+                      <span className="text-xs text-slate-400 block mt-0.5">
                         ⏰ {permit.startTime} - {permit.endTime}
                       </span>
                     </td>
 
                     {/* Applicant & Company */}
-                    <td className="p-3.5 align-top">
-                      <span className="font-bold text-slate-900 block truncate max-w-[160px]">
+                    <td className="p-3.5 align-top w-[210px]">
+                      <span className="font-bold text-slate-900 block truncate max-w-[190px] text-xs">
                         {permit.applicantName}
                       </span>
-                      <span className="text-[11px] text-slate-500 block truncate max-w-[160px]">
+                      <span className="text-xs text-slate-500 block truncate max-w-[190px] mt-0.5">
                         {permit.company}
                       </span>
-                      <span className="text-[10px] text-slate-400 block mt-0.5">
+                      <span className="text-xs text-slate-400 block mt-0.5">
                         📞 {permit.phone} ({permit.workerCount} {getUIText('personsCount', currentLang)})
                       </span>
                     </td>
 
                     {/* Location & Summary */}
-                    <td className="p-3.5 align-top max-w-[200px]">
-                      <span className="font-semibold text-slate-800 block truncate">
+                    <td className="p-3.5 align-top min-w-[200px]">
+                      <span className="font-semibold text-slate-800 block truncate text-xs">
                         📍 {permit.location}
                       </span>
-                      <p className="text-[11px] text-slate-500 line-clamp-2 mt-0.5">
+                      <p className="text-xs text-slate-500 line-clamp-2 mt-0.5 leading-relaxed">
                         {permit.jobDescription}
                       </p>
                     </td>
 
                     {/* Risk Badges */}
-                    <td className="p-3.5 align-top">
-                      <div className="flex flex-wrap gap-1 max-w-[160px]">
+                    <td className="p-3.5 align-top w-[180px]">
+                      <div className="flex flex-wrap gap-1 max-w-[170px]">
                         {permit.riskTypes.slice(0, 2).map((r, rIdx) => (
                           <span
                             key={rIdx}
-                            className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-slate-100 text-slate-700 text-[10px] font-semibold border border-slate-200"
+                            className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-slate-100 text-slate-700 text-xs font-medium border border-slate-200"
                           >
                             <span>{getRiskIcon(r)}</span>
                             <span className="truncate max-w-[100px]">{r.split(' ')[0]}</span>
                           </span>
                         ))}
                         {permit.riskTypes.length > 2 && (
-                          <span className="text-[10px] font-bold text-slate-400 self-center">
+                          <span className="text-xs font-bold text-slate-400 self-center">
                             +{permit.riskTypes.length - 2}
                           </span>
                         )}
                       </div>
                       <div className="mt-1">
-                        <span className="text-[10px] text-slate-400 font-mono">
+                        <span className="text-xs text-slate-400 font-mono">
                           Risk: {permit.riskMatrix?.score || 6}/25 ({permit.riskMatrix?.level || 'med'})
                         </span>
                       </div>
                     </td>
 
                     {/* Status */}
-                    <td className="p-3.5 align-top">
+                    <td className="p-3.5 align-top w-[150px]">
                       {getStatusBadge(permit.status)}
                       {permit.safetyOfficerName && (
-                        <span className="block text-[10px] text-slate-400 mt-1 truncate max-w-[140px]">
+                        <span className="block text-xs text-slate-400 mt-1 truncate max-w-[140px]">
                           {getUIText('approverLabel', currentLang)} {permit.safetyOfficerName.split(' ')[0]}
                         </span>
                       )}
