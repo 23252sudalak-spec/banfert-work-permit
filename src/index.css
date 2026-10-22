@@ -117,6 +117,17 @@ html[data-lang="zh"] .text-\[11px\] {
   scrollbar-width: none;
 }
 
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+}
+
+/* Subtle focus indicators */
+*:focus-visible {
+  outline: 2px solid #f59e0b;
+  outline-offset: 2px;
+}
+
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -146,4 +157,5 @@ html[data-lang="zh"] .text-\[11px\] {
 .animate-slideInRight {
   animation: slideInRight 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
+
 
