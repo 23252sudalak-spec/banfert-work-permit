@@ -56,7 +56,107 @@ export const UI_TRANSLATIONS: Record<string, TranslationItem> = {
     my: '📤 ထုတ်ယူ/ပုံနှိပ်',
   },
 
-  // QQ Mail Auth & User Profile
+  // WeChat & QQ Auth & User Profile
+  signInWeChat: {
+    th: 'เข้าสู่ระบบด้วย WeChat (微信)',
+    zh: '微信登录',
+    my: 'WeChat ဖြင့် အကောင့်ဝင်ပါ',
+  },
+  signInWeChatShort: {
+    th: 'WeChat',
+    zh: '微信登录',
+    my: 'WeChat',
+  },
+  wechatModalTitle: {
+    th: 'เข้าใช้งานผ่าน WeChat (微信登录)',
+    zh: '微信快捷安全认证登录',
+    my: 'WeChat ဖြင့် အကောင့်ဝင်ခြင်း',
+  },
+  wechatModalDesc: {
+    th: 'รองรับการเข้าสู่ระบบด้วย WeChat ID หรือสแกน QR Code สำหรับ จป.วิชาชีพ และผู้รับเหมาในโครงการ',
+    zh: '支持微信号与手机微信扫码一键登录，连接安全主任微信',
+    my: 'ဆိုက်လုံခြုံရေးအရာရှိနှင့် ကန်ထရိုက်တာများအတွက် WeChat ID သို့မဟုတ် QR စကင်န်ဖြင့် အကောင့်ဝင်ပါ',
+  },
+  tabWeChatQr: {
+    th: '📱 สแกน QR Code ด้วย WeChat',
+    zh: '📱 微信扫码登录',
+    my: '📱 WeChat QR Code စကင်န်',
+  },
+  tabWeChatId: {
+    th: '💬 เข้าสู่ระบบด้วย WeChat ID',
+    zh: '💬 微信号快捷登录',
+    my: '💬 WeChat ID ဖြင့် အကောင့်ဝင်ပါ',
+  },
+  labelWeChatId: {
+    th: 'หมายเลข WeChat ID (微信号):',
+    zh: '微信号 / 手机号 (WeChat ID):',
+    my: 'WeChat ID နံပါတ် -',
+  },
+  placeholderWeChatId: {
+    th: 'เช่น wxid_fsgmwe1ebk7l12 หรือเบอร์โทร',
+    zh: '如 wxid_fsgmwe1ebk7l12 或微信号',
+    my: 'ဥပမာ wxid_fsgmwe1ebk7l12',
+  },
+  btnLoginWeChat: {
+    th: 'ยืนยันเข้าสู่ระบบ WeChat',
+    zh: '立即微信登录',
+    my: 'WeChat ဖြင့် အကောင့်ဝင်ပါ',
+  },
+  wechatFastLoginSafetyOfficer: {
+    th: '⚡ เข้าสู่ระบบทันที: จป.วิชาชีพ (wxid_fsgmwe1ebk7l12)',
+    zh: '⚡ 快捷一键登录：安全官 (wxid_fsgmwe1ebk7l12)',
+    my: '⚡ လုံခြုံရေးအရာရှိအဖြစ် ချက်ချင်းဝင်ပါ (wxid_fsgmwe1ebk7l12)',
+  },
+  wechatNotifyBellTitle: {
+    th: 'แจ้งเตือน WeChat จป. (wxid_fsgmwe1ebk7l12)',
+    zh: '微信待审批通知 (wxid_fsgmwe1ebk7l12)',
+    my: 'WeChat အသိပေးချက် (wxid_fsgmwe1ebk7l12)',
+  },
+  wechatNotifyCardHeader: {
+    th: '📢 ข้อความแจ้งเตือนขออนุมัติ จป. (WeChat Service Message)',
+    zh: '📢 微信待审批服务通知 (模板消息)',
+    my: '📢 လုံခြုံရေးအရာရှိထံ အသိပေးချက် (WeChat Service Message)',
+  },
+  wechatRecipientBadge: {
+    th: 'ส่งถึง WeChat จป.วิชาชีพ: wxid_fsgmwe1ebk7l12',
+    zh: '接收人安全官微信: wxid_fsgmwe1ebk7l12',
+    my: 'လက်ခံသူ လုံခြုံရေးအရာရှိ WeChat: wxid_fsgmwe1ebk7l12',
+  },
+  wechatCopySuccess: {
+    th: 'คัดลอกข้อความ WeChat เรียบร้อยแล้ว!',
+    zh: '已成功复制微信卡片消息内容！',
+    my: 'WeChat မက်ဆေ့ခ်ျ ကူးယူပြီးပါပြီ!',
+  },
+  wechatBtnCopy: {
+    th: '📋 คัดลอกส่งเข้าแชท WeChat',
+    zh: '📋 复制微信通知卡片',
+    my: '📋 WeChat တွင် ပို့ရန် ကူးယူပါ',
+  },
+  wechatBtnOpen: {
+    th: '💬 เปิดใน WeChat',
+    zh: '💬 打开微信客户端',
+    my: '💬 WeChat ဖွင့်ပါ',
+  },
+  wechatBtnApprove: {
+    th: '✅ อนุมัติผ่าน WeChat โดย จป.',
+    zh: '✅ 安全主任微信端一键批准',
+    my: '✅ လုံခြုံရေးအရာရှိမှ အတည်ပြုပါ',
+  },
+  wechatToastSent: {
+    th: 'ส่งการแจ้งเตือนขออนุมัติไปยัง WeChat ID: wxid_fsgmwe1ebk7l12 แล้ว!',
+    zh: '已向安全官微信 (ID: wxid_fsgmwe1ebk7l12) 发送待审批通知！',
+    my: 'လုံခြုံရေးအရာရှိ WeChat (ID: wxid_fsgmwe1ebk7l12) သို့ အသိပေးချက် ပေးပို့ပြီးပါပြီ!',
+  },
+  wechatNoNotif: {
+    th: 'ยังไม่มีข้อความแจ้งเตือนใหม่สำหรับ จป. ID: wxid_fsgmwe1ebk7l12',
+    zh: '暂无发送给安全官微信 (wxid_fsgmwe1ebk7l12) 的新待审批通知',
+    my: 'လုံခြုံရေးအရာရှိ (wxid_fsgmwe1ebk7l12) အတွက် အသိပေးချက်အသစ် မရှိသေးပါ',
+  },
+  wechatSendTestNotif: {
+    th: '🔔 ทดสอบส่งการแจ้งเตือนเข้า wxid_fsgmwe1ebk7l12',
+    zh: '🔔 模拟发送审批通知至 wxid_fsgmwe1ebk7l12',
+    my: '🔔 wxid_fsgmwe1ebk7l12 သို့ စမ်းသပ်အသိပေးချက် ပေးပို့ပါ',
+  },
   signInQQMail: {
     th: 'เข้าสู่ระบบด้วย QQ Mail (จีน)',
     zh: 'QQ 邮箱登录',

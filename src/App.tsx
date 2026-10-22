@@ -16,8 +16,18 @@ import { getLocalizedSections } from './utils/permitLocalization';
 import { getUIText } from './data/translations';
 import { Language, PermitRecord, PermitStatus } from './types/permit';
 import { QQUser } from './types/qqUser';
+import { WeChatUser, WeChatNotification, TARGET_SAFETY_OFFICER_WXID } from './types/wechat';
 import { getSavedQQUser, clearQQUserSession } from './services/qqAuthService';
+import { getSavedWeChatUser, clearWeChatUserSession } from './services/wechatAuthService';
+import {
+  getWeChatNotifications,
+  getUnreadWeChatCount,
+  updateWeChatNotificationStatus,
+} from './services/wechatNotificationService';
 import { QQMailAuthModal } from './components/QQMailAuthModal';
+import { WeChatAuthModal } from './components/WeChatAuthModal';
+import { WeChatNotificationModal } from './components/WeChatNotificationModal';
+import { WeChatToast } from './components/WeChatToast';
 import {
   loadPermits,
   savePermit as storageSavePermit,
@@ -34,19 +44,53 @@ export default function App() {
   const [qqUser, setQQUser] = useState<QQUser | null>(null);
   const [isQQModalOpen, setIsQQModalOpen] = useState<boolean>(false);
 
+  // WeChat Auth State
+  const [wechatUser, setWechatUser] = useState<WeChatUser | null>(null);
+  const [isWeChatModalOpen, setIsWeChatModalOpen] = useState<boolean>(false);
+
+  // WeChat Notifications State (dedicated to wxid_fsgmwe1ebk7l12)
+  const [wechatNotifications, setWechatNotifications] = useState<WeChatNotification[]>([]);
+  const [unreadWeChatCount, setUnreadWeChatCount] = useState<number>(0);
+  const [isWeChatNotificationModalOpen, setIsWeChatNotificationModalOpen] = useState<boolean>(false);
+
   // Permits state
   const [permits, setPermits] = useState<PermitRecord[]>([]);
   const [editingPermit, setEditingPermit] = useState<PermitRecord>(createBlankPermit());
   const [viewingPermit, setViewingPermit] = useState<PermitRecord | null>(null);
 
-  // Load permits and QQ user on app start
+  const refreshWeChatNotifications = () => {
+    const list = getWeChatNotifications();
+    setWechatNotifications(list);
+    setUnreadWeChatCount(getUnreadWeChatCount());
+  };
+
+  // Load permits, QQ user, WeChat user, and notifications on app start
   useEffect(() => {
     const loaded = loadPermits();
     setPermits(loaded);
-    const savedUser = getSavedQQUser();
-    if (savedUser) {
-      setQQUser(savedUser);
+
+    const savedQQ = getSavedQQUser();
+    if (savedQQ) {
+      setQQUser(savedQQ);
     }
+
+    const savedWX = getSavedWeChatUser();
+    if (savedWX) {
+      setWechatUser(savedWX);
+    }
+
+    refreshWeChatNotifications();
+
+    const handleNotifUpdate = () => {
+      refreshWeChatNotifications();
+    };
+
+    window.addEventListener('wechat-notifications-updated', handleNotifUpdate);
+    window.addEventListener('wechat-alert-dispatched', handleNotifUpdate);
+    return () => {
+      window.removeEventListener('wechat-notifications-updated', handleNotifUpdate);
+      window.removeEventListener('wechat-alert-dispatched', handleNotifUpdate);
+    };
   }, []);
 
   const handleLogoutQQ = () => {
@@ -54,10 +98,38 @@ export default function App() {
     setQQUser(null);
   };
 
+  const handleLogoutWeChat = () => {
+    clearWeChatUserSession();
+    setWechatUser(null);
+  };
+
+  const handleApproveFromWeChat = (permitId: string) => {
+    storageUpdateStatus(permitId, 'approved');
+    updateWeChatNotificationStatus(permitId, 'approved');
+    const refreshed = loadPermits();
+    setPermits(refreshed);
+    refreshWeChatNotifications();
+  };
+
+  const handleViewPermitFromWeChat = (permitId: string) => {
+    const found = permits.find((p) => p.id === permitId || p.permitNumber === permitId);
+    if (found) {
+      setViewingPermit(found);
+    }
+  };
+
   // Permit Actions
   const handleCreateNew = () => {
     const blank = createBlankPermit();
-    if (qqUser) {
+    if (wechatUser) {
+      if (wechatUser.role === 'safety_officer') {
+        blank.safetyOfficerName = wechatUser.nickname;
+      } else {
+        blank.applicantName = wechatUser.nickname;
+        blank.company = wechatUser.company;
+        blank.phone = wechatUser.phone;
+      }
+    } else if (qqUser) {
       blank.createdByEmail = qqUser.email;
       if (qqUser.role === 'safety_officer') {
         blank.safetyOfficerName = qqUser.nickname;
@@ -118,6 +190,11 @@ export default function App() {
         qqUser={qqUser}
         onOpenQQLogin={() => setIsQQModalOpen(true)}
         onLogoutQQ={handleLogoutQQ}
+        wechatUser={wechatUser}
+        onOpenWeChatLogin={() => setIsWeChatModalOpen(true)}
+        onLogoutWeChat={handleLogoutWeChat}
+        unreadWeChatCount={unreadWeChatCount}
+        onOpenWeChatNotifications={() => setIsWeChatNotificationModalOpen(true)}
       />
 
       {/* Main Container */}
@@ -141,6 +218,7 @@ export default function App() {
             onCancel={() => setActiveTab('permits')}
             currentLang={currentLang}
             qqUser={qqUser}
+            wechatUser={wechatUser}
           />
         )}
 
@@ -180,7 +258,9 @@ export default function App() {
               {getUIText('footerActiveCount', currentLang)} {permits.length}
             </span>
             <span>•</span>
-            <span>{getUIText('footerStandard', currentLang)}</span>
+            <span className="text-emerald-400 font-mono">
+              WeChat จป. ID: {TARGET_SAFETY_OFFICER_WXID}
+            </span>
           </div>
         </div>
       </footer>
@@ -203,7 +283,36 @@ export default function App() {
         onLoginSuccess={(user) => {
           setQQUser(user);
         }}
+        onSwitchToWeChat={() => setIsWeChatModalOpen(true)}
         currentLang={currentLang}
+      />
+
+      {/* WeChat Auth Modal */}
+      <WeChatAuthModal
+        isOpen={isWeChatModalOpen}
+        onClose={() => setIsWeChatModalOpen(false)}
+        onLoginSuccess={(user) => {
+          setWechatUser(user);
+        }}
+        onSwitchToQQ={() => setIsQQModalOpen(true)}
+        currentLang={currentLang}
+      />
+
+      {/* WeChat Notification Center Modal (wxid_fsgmwe1ebk7l12) */}
+      <WeChatNotificationModal
+        isOpen={isWeChatNotificationModalOpen}
+        onClose={() => setIsWeChatNotificationModalOpen(false)}
+        notifications={wechatNotifications}
+        onApprovePermit={handleApproveFromWeChat}
+        onViewPermit={handleViewPermitFromWeChat}
+        onRefreshNotifications={refreshWeChatNotifications}
+        currentLang={currentLang}
+      />
+
+      {/* Real-time WeChat notification toast */}
+      <WeChatToast
+        currentLang={currentLang}
+        onOpenNotificationModal={() => setIsWeChatNotificationModalOpen(true)}
       />
     </div>
   );

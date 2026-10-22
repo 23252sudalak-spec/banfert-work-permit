@@ -7,9 +7,12 @@ import {
   LogOut,
   User,
   Mail,
+  MessageCircle,
+  Bell,
 } from 'lucide-react';
 import { Language } from '../types/permit';
 import { QQUser } from '../types/qqUser';
+import { WeChatUser, TARGET_SAFETY_OFFICER_WXID } from '../types/wechat';
 import { getUIText } from '../data/translations';
 
 export type AppTab = 'permits' | 'editor' | 'specs' | 'matrix' | 'export';
@@ -23,6 +26,11 @@ interface NavbarProps {
   qqUser: QQUser | null;
   onOpenQQLogin: () => void;
   onLogoutQQ: () => void;
+  wechatUser: WeChatUser | null;
+  onOpenWeChatLogin: () => void;
+  onLogoutWeChat: () => void;
+  unreadWeChatCount: number;
+  onOpenWeChatNotifications: () => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
@@ -34,9 +42,15 @@ export const Navbar: React.FC<NavbarProps> = ({
   qqUser,
   onOpenQQLogin,
   onLogoutQQ,
+  wechatUser,
+  onOpenWeChatLogin,
+  onLogoutWeChat,
+  unreadWeChatCount,
+  onOpenWeChatNotifications,
 }) => {
   const [isLangMenuOpen, setIsLangMenuOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  const [isWeChatMenuOpen, setIsWeChatMenuOpen] = useState(false);
 
   const mainLangs: { id: Language; label: string; flag: string }[] = [
     { id: 'th', label: 'ไทย', flag: '🇹🇭' },
@@ -202,8 +216,112 @@ export const Navbar: React.FC<NavbarProps> = ({
               </div>
             </div>
 
-            {/* QQ Mail Authentication Status or Login Button */}
-            {qqUser ? (
+            {/* WeChat Notification Bell (Dedicated to จป. ID: wxid_fsgmwe1ebk7l12) */}
+            <button
+              onClick={onOpenWeChatNotifications}
+              className="relative h-9 w-9 sm:w-auto sm:px-2.5 rounded-xl bg-slate-800 hover:bg-slate-700/90 border border-slate-700 text-slate-200 flex items-center justify-center gap-1.5 transition-all shrink-0 group"
+              title={`การแจ้งเตือนขออนุมัติ จป. WeChat (ID: ${TARGET_SAFETY_OFFICER_WXID})`}
+            >
+              <div className="relative flex items-center justify-center">
+                <Bell className="w-4 h-4 text-emerald-400 group-hover:scale-110 transition-transform" />
+                {unreadWeChatCount > 0 && (
+                  <span className="absolute -top-1.5 -right-2 px-1.5 py-0.2 min-w-[16px] text-center rounded-full bg-rose-500 text-white font-black text-[9px] shadow-sm animate-pulse">
+                    {unreadWeChatCount}
+                  </span>
+                )}
+              </div>
+              <span className="hidden xl:inline text-[11px] font-semibold text-emerald-300">
+                {TARGET_SAFETY_OFFICER_WXID}
+              </span>
+            </button>
+
+            {/* WeChat User Authentication Status or Login Button */}
+            {wechatUser ? (
+              <div className="relative">
+                <button
+                  onClick={() => setIsWeChatMenuOpen(!isWeChatMenuOpen)}
+                  className="h-9 flex items-center gap-2 px-2.5 bg-slate-800 hover:bg-slate-700/80 border border-emerald-500/50 text-white rounded-xl text-xs font-semibold transition-all shrink-0 ring-1 ring-emerald-500/20"
+                >
+                  <div className="w-5 h-5 rounded-lg bg-[#07C160] text-white flex items-center justify-center font-bold text-[10px]">
+                    <MessageCircle className="w-3.5 h-3.5 fill-white" />
+                  </div>
+                  <span className="font-bold text-emerald-300 hidden md:inline truncate max-w-[120px]">
+                    {wechatUser.wxid === TARGET_SAFETY_OFFICER_WXID ? 'จป. (wxid_...)' : wechatUser.nickname.split(' ')[0]}
+                  </span>
+                  <span className="px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-300 text-[10px] hidden sm:inline">
+                    {wechatUser.role === 'safety_officer' ? 'จป.' : 'ผู้รับเหมา'}
+                  </span>
+                  <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
+                </button>
+
+                {isWeChatMenuOpen && (
+                  <>
+                    <div
+                      className="fixed inset-0 z-30"
+                      onClick={() => setIsWeChatMenuOpen(false)}
+                    />
+                    <div className="absolute right-0 mt-2 w-72 bg-slate-800 border border-slate-700 rounded-2xl shadow-2xl py-3 px-3 z-40 text-xs text-slate-200 animate-fadeIn space-y-2.5">
+                      <div className="flex items-center gap-2.5 border-b border-slate-700/80 pb-2.5">
+                        <div className="w-10 h-10 rounded-xl bg-[#07C160] text-white flex items-center justify-center shrink-0">
+                          <MessageCircle className="w-6 h-6 fill-white" />
+                        </div>
+                        <div className="min-w-0">
+                          <p className="font-bold text-white text-xs truncate">
+                            {wechatUser.nickname}
+                          </p>
+                          <p className="text-[11px] text-emerald-400 font-mono truncate">
+                            WeChat ID: {wechatUser.wxid}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="space-y-1 text-[11px] text-slate-300">
+                        <div className="flex items-center justify-between">
+                          <span className="text-slate-400">บทบาท / 职务:</span>
+                          <span className="font-semibold text-emerald-300">
+                            {wechatUser.roleTitle[currentLang === 'zh' ? 'zh' : currentLang === 'my' ? 'my' : 'th']}
+                          </span>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span className="text-slate-400">สังกัด / 单位:</span>
+                          <span className="font-medium text-slate-300 truncate max-w-[160px]" title={wechatUser.company}>
+                            {wechatUser.company}
+                          </span>
+                        </div>
+                        {wechatUser.wxid === TARGET_SAFETY_OFFICER_WXID && (
+                          <div className="mt-1 p-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-[10px] text-emerald-300 font-medium">
+                            ✓ บัญชี จป.วิชาชีพเป้าหมาย รับแจ้งเตือน PTW อัตโนมัติ
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="border-t border-slate-700/80 pt-2 flex items-center justify-between gap-2">
+                        <button
+                          onClick={() => {
+                            setIsWeChatMenuOpen(false);
+                            onOpenWeChatLogin();
+                          }}
+                          className="flex-1 py-1.5 px-2 bg-slate-700 hover:bg-slate-600 text-slate-200 rounded-lg text-[11px] font-semibold text-center transition-colors"
+                        >
+                          สลับบัญชี (切换)
+                        </button>
+                        <button
+                          onClick={() => {
+                            setIsWeChatMenuOpen(false);
+                            onLogoutWeChat();
+                          }}
+                          className="py-1.5 px-2.5 bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 rounded-lg text-[11px] font-bold transition-colors flex items-center gap-1"
+                          title={getUIText('signOut', currentLang)}
+                        >
+                          <LogOut className="w-3.5 h-3.5" />
+                          <span>{getUIText('signOut', currentLang)}</span>
+                        </button>
+                      </div>
+                    </div>
+                  </>
+                )}
+              </div>
+            ) : qqUser ? (
               <div className="relative">
                 <button
                   onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
@@ -284,17 +402,30 @@ export const Navbar: React.FC<NavbarProps> = ({
                 )}
               </div>
             ) : (
-              <button
-                onClick={onOpenQQLogin}
-                className="h-9 flex items-center gap-1.5 px-3 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-bold shadow-md shadow-blue-600/20 transition-all hover:scale-[1.02] active:scale-95 shrink-0"
-                title="เข้าสู่ระบบด้วย QQ Mail (QQ 邮箱登录)"
-              >
-                <span className="w-4 h-4 rounded bg-white text-blue-600 text-[10px] font-black flex items-center justify-center font-sans">
-                  QQ
-                </span>
-                <span className="hidden md:inline">{getUIText('signInQQMail', currentLang)}</span>
-                <span className="md:hidden">{getUIText('signInQQShort', currentLang)}</span>
-              </button>
+              <div className="flex items-center gap-1.5">
+                {/* WeChat Login CTA */}
+                <button
+                  onClick={onOpenWeChatLogin}
+                  className="h-9 flex items-center gap-1.5 px-2.5 sm:px-3 bg-[#07C160] hover:bg-emerald-600 text-white rounded-xl text-xs font-bold shadow-md shadow-emerald-600/20 transition-all hover:scale-[1.02] active:scale-95 shrink-0"
+                  title="เข้าสู่ระบบด้วย WeChat (微信登录)"
+                >
+                  <MessageCircle className="w-3.5 h-3.5 fill-white" />
+                  <span className="hidden sm:inline">{getUIText('signInWeChat', currentLang)}</span>
+                  <span className="sm:hidden">{getUIText('signInWeChatShort', currentLang)}</span>
+                </button>
+
+                {/* QQ Mail Login CTA */}
+                <button
+                  onClick={onOpenQQLogin}
+                  className="h-9 flex items-center gap-1 px-2.5 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-bold shadow-md shadow-blue-600/20 transition-all hover:scale-[1.02] active:scale-95 shrink-0"
+                  title="เข้าสู่ระบบด้วย QQ Mail (QQ 邮箱登录)"
+                >
+                  <span className="w-3.5 h-3.5 rounded bg-white text-blue-600 text-[9px] font-black flex items-center justify-center font-sans">
+                    QQ
+                  </span>
+                  <span className="hidden lg:inline">{getUIText('signInQQShort', currentLang)}</span>
+                </button>
+              </div>
             )}
 
             {/* Direct New Permit CTA Button */}

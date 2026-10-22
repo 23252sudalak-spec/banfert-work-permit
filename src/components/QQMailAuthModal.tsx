@@ -28,6 +28,7 @@ interface QQMailAuthModalProps {
   isOpen: boolean;
   onClose: () => void;
   onLoginSuccess: (user: QQUser) => void;
+  onSwitchToWeChat?: () => void;
   currentLang: Language;
 }
 
@@ -35,6 +36,7 @@ export const QQMailAuthModal: React.FC<QQMailAuthModalProps> = ({
   isOpen,
   onClose,
   onLoginSuccess,
+  onSwitchToWeChat,
   currentLang,
 }) => {
   const [authTab, setAuthTab] = useState<'password' | 'code' | 'qrcode'>('password');
@@ -519,6 +521,25 @@ export const QQMailAuthModal: React.FC<QQMailAuthModalProps> = ({
             </div>
           )}
         </div>
+
+        {/* Switch to WeChat */}
+        {onSwitchToWeChat && (
+          <div className="px-6 py-2.5 bg-emerald-50/60 border-t border-emerald-100 flex items-center justify-between text-xs">
+            <span className="text-emerald-800">
+              ต้องการเข้าสู่ระบบด้วย WeChat (微信登录)?
+            </span>
+            <button
+              type="button"
+              onClick={() => {
+                onClose();
+                onSwitchToWeChat();
+              }}
+              className="px-2.5 py-1 bg-[#07C160] hover:bg-emerald-600 text-white rounded-lg text-xs font-bold transition-all shadow-xs"
+            >
+              สลับไป WeChat
+            </button>
+          </div>
+        )}
 
         {/* Footer info note */}
         <div className="bg-slate-50 border-t border-slate-200 px-6 py-3 text-[11px] text-slate-500 flex items-center justify-between">

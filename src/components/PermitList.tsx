@@ -11,8 +11,11 @@ import {
   Eye,
   Trash2,
   Check,
+  MessageCircle,
 } from 'lucide-react';
 import { PermitRecord, PermitStatus, Language } from '../types/permit';
+import { TARGET_SAFETY_OFFICER_WXID } from '../types/wechat';
+import { sendWeChatApprovalNotification } from '../services/wechatNotificationService';
 import { getUIText } from '../data/translations';
 
 interface PermitListProps {
@@ -437,13 +440,24 @@ export const PermitList: React.FC<PermitListProps> = ({
 
                         {/* Quick Approve / Close Dropdown Menu */}
                         {permit.status === 'pending_approval' && (
-                          <button
-                            onClick={() => onUpdateStatus(permit.id, 'approved')}
-                            className="p-1.5 rounded-lg text-emerald-600 hover:bg-emerald-50 transition-colors font-bold text-[11px]"
-                            title={getUIText('actionQuickApprove', currentLang)}
-                          >
-                            <CheckCircle2 className="w-4 h-4" />
-                          </button>
+                          <>
+                            <button
+                              onClick={() => {
+                                sendWeChatApprovalNotification(permit);
+                              }}
+                              className="p-1.5 rounded-lg text-[#07C160] hover:bg-emerald-50 transition-colors"
+                              title={`ส่งแจ้งเตือนเข้า WeChat จป. (${TARGET_SAFETY_OFFICER_WXID})`}
+                            >
+                              <MessageCircle className="w-4 h-4 fill-[#07C160]" />
+                            </button>
+                            <button
+                              onClick={() => onUpdateStatus(permit.id, 'approved')}
+                              className="p-1.5 rounded-lg text-emerald-600 hover:bg-emerald-50 transition-colors font-bold text-[11px]"
+                              title={getUIText('actionQuickApprove', currentLang)}
+                            >
+                              <CheckCircle2 className="w-4 h-4" />
+                            </button>
+                          </>
                         )}
 
                         {permit.status === 'approved' && (

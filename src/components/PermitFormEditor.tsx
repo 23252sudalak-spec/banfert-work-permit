@@ -7,9 +7,12 @@ import {
   Send,
   Activity,
   Check,
+  MessageCircle,
 } from 'lucide-react';
 import { PermitRecord, Language, PermitStatus } from '../types/permit';
 import { QQUser } from '../types/qqUser';
+import { WeChatUser, TARGET_SAFETY_OFFICER_WXID } from '../types/wechat';
+import { sendWeChatApprovalNotification } from '../services/wechatNotificationService';
 import { calculateRiskLevel } from '../services/permitStorage';
 import {
   getUIText,
@@ -24,6 +27,7 @@ interface PermitFormEditorProps {
   onCancel: () => void;
   currentLang: Language;
   qqUser?: QQUser | null;
+  wechatUser?: WeChatUser | null;
 }
 
 export const PermitFormEditor: React.FC<PermitFormEditorProps> = ({
@@ -32,10 +36,12 @@ export const PermitFormEditor: React.FC<PermitFormEditorProps> = ({
   onCancel,
   currentLang,
   qqUser,
+  wechatUser,
 }) => {
   const [formData, setFormData] = useState<PermitRecord>(initialPermit);
   const [activeSection, setActiveSection] = useState<number>(1);
   const [isSavedSuccess, setIsSavedSuccess] = useState<boolean>(false);
+  const [wechatNotifSent, setWechatNotifSent] = useState<boolean>(false);
   const [validationError, setValidationError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -175,12 +181,20 @@ export const PermitFormEditor: React.FC<PermitFormEditorProps> = ({
       return;
     }
 
-    setValidationError(null);
-
+    const targetStatus = overrideStatus || formData.status;
     const permitToSave: PermitRecord = {
       ...formData,
-      status: overrideStatus || formData.status,
+      status: targetStatus,
     };
+
+    // If submitting for Safety Officer approval, dispatch instant notification to WeChat ID: wxid_fsgmwe1ebk7l12
+    if (targetStatus === 'pending_approval') {
+      sendWeChatApprovalNotification(permitToSave);
+      setWechatNotifSent(true);
+      setTimeout(() => {
+        setWechatNotifSent(false);
+      }, 4500);
+    }
 
     onSave(permitToSave);
     setIsSavedSuccess(true);
@@ -1010,6 +1024,41 @@ export const PermitFormEditor: React.FC<PermitFormEditorProps> = ({
                 />
               </div>
             </div>
+
+            {/* WeChat Auto-Dispatch Alert Note */}
+            <div className="p-3 bg-emerald-50 rounded-xl border border-emerald-200 text-xs flex items-center justify-between gap-3">
+              <div className="flex items-center gap-2 text-emerald-900">
+                <div className="w-6 h-6 rounded-lg bg-[#07C160] text-white flex items-center justify-center shrink-0">
+                  <MessageCircle className="w-3.5 h-3.5 fill-white" />
+                </div>
+                <div className="text-[11px] leading-relaxed">
+                  <span className="font-bold">ระบบแจ้งเตือน WeChat อัตโนมัติ: </span>
+                  <span className="text-emerald-800">
+                    เมื่อส่งขออนุมัติ ระบบจะส่งการแจ้งเตือนและรายละเอียดงานเสี่ยงไปยัง WeChat ของ จป.วิชาชีพ ID:{' '}
+                  </span>
+                  <span className="font-mono font-bold bg-white px-1.5 py-0.5 rounded text-emerald-800 border border-emerald-300">
+                    {TARGET_SAFETY_OFFICER_WXID}
+                  </span>
+                </div>
+              </div>
+              <span className="hidden sm:inline px-2 py-0.5 rounded bg-emerald-200/60 text-emerald-800 font-bold text-[10px] shrink-0">
+                พร้อมส่งทันที
+              </span>
+            </div>
+
+            {wechatNotifSent && (
+              <div className="p-3 bg-emerald-600 text-white rounded-xl text-xs font-bold flex items-center justify-between gap-2 shadow-md animate-fadeIn">
+                <div className="flex items-center gap-2">
+                  <Check className="w-4 h-4 text-emerald-200 shrink-0" />
+                  <span>
+                    ส่งแจ้งเตือนขออนุมัติไปยัง WeChat ID: {TARGET_SAFETY_OFFICER_WXID} เรียบร้อยแล้ว!
+                  </span>
+                </div>
+                <span className="text-[10px] bg-white/20 px-2 py-0.5 rounded text-white font-mono">
+                  WeChat Push: Sent
+                </span>
+              </div>
+            )}
           </div>
 
           <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-slate-100">
@@ -1029,9 +1078,10 @@ export const PermitFormEditor: React.FC<PermitFormEditorProps> = ({
               </button>
               <button
                 onClick={() => handleValidateAndSave('pending_approval')}
-                className="px-5 py-2.5 bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 font-bold text-xs rounded-xl shadow-lg shadow-amber-500/20 hover:scale-105 active:scale-95 transition-all"
+                className="px-5 py-2.5 bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 font-bold text-xs rounded-xl shadow-lg shadow-amber-500/20 hover:scale-105 active:scale-95 transition-all flex items-center gap-2"
               >
-                {getUIText('btnSubmitReview', currentLang)}
+                <MessageCircle className="w-3.5 h-3.5 fill-slate-950" />
+                <span>{getUIText('btnSubmitReview', currentLang)}</span>
               </button>
             </div>
           </div>
